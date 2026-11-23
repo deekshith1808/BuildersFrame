@@ -1,0 +1,320 @@
+[
+  {
+    "id": "sih-1601",
+    "code": "SIH1601",
+    "title": "Early Detection and Automated Remediation Advisory for Crop Pest Infestations using Edge AI and Low-Cost Optics",
+    "organization": "Ministry of Agriculture & Farmers Welfare",
+    "domain": "Smart Agriculture",
+    "category": "Both",
+    "affected_group": "Smallholder farmers in drought-prone and delta districts with limited agronomist access",
+    "summary": "Build a lightweight edge-compatible mobile/IoT scanning solution that identifies pest egg clusters and leaf blights at early onset and provides targeted, regional-language organic/chemical pesticide dosage advice.",
+    "context": "Fall Armyworm and Pink Bollworm cause over 30% yield loss in cotton and maize before visible damage prompts spraying. Farmers currently over-spray blanket broad-spectrum pesticides, causing soil degradation and financial distress.",
+    "constraints": "Must work fully offline with on-device quantized model inference (TFLite/ONNX). Sensor/attachment BOM must remain under ₹800. Must support Tamil, Hindi, Telugu, and Marathi audio prompts.",
+    "required_skills": ["Python", "TensorFlow/PyTorch", "OpenCV", "Flutter", "Embedded C/ESP32"],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 9.1,
+    "feasibility_notes": "Datasets are publicly available from ICAR and PlantVillage. 36-hour prototype can demonstrate smartphone macro-lens capture + quantized MobileNetV4 inference.",
+    "sources": [
+      {
+        "name": "Smart India Hackathon 2024 Portal (PS ID: 1601)",
+        "url": "https://sih.gov.in/sih2024PS",
+        "checked_date": "2026-10-18"
+      },
+      {
+        "name": "ICAR Annual Research Report on Crop Protection",
+        "url": "https://icar.org.in",
+        "checked_date": "2026-09-12"
+      }
+    ],
+    "checked_date": "2026-11-15",
+    "status": "Active",
+    "hints": "Judges look for offline inference speed and realistic dosage recommendations based on acreage, rather than generic bounding-box detection. Highlight regional voice feedback for semi-literate farmers.",
+    "previous_prototypes": [
+      {
+        "team_name": "AgriVision (SIH 2023 Runner-Up)",
+        "year": "2023",
+        "prototype_summary": "Built a basic ResNet50 classifier deployed on a cloud server with Streamlit UI.",
+        "shortcoming": "Failed in real farm tests due to 4G connectivity dropouts in rural fields and lacked actionable remediation dosages.",
+        "repo_url": "https://github.com/example/agrivision-sih23-prototype"
+      },
+      {
+        "team_name": "CropLens",
+        "year": "2024",
+        "prototype_summary": "Raspberry Pi 4 with camera mounted on a stick with local web interface.",
+        "shortcoming": "Hardware BOM cost exceeded ₹6,500, making it unaffordable for individual smallholders; high battery consumption (2.5 hours runtime).",
+        "repo_url": "https://github.com/example/croplens-hardware-v1"
+      }
+    ],
+    "sample_solution_direction": "Use a 3D-printed $2 macro optical clip for standard smartphones + quantized MobileNet-EdgeTPU model running in Flutter with local SQLite dosage lookup matrix."
+  },
+  {
+    "id": "sih-1645",
+    "code": "SIH1645",
+    "title": "Real-time Detection and Volumetric Quantification of Road Potholes and Surface Hazards via Smartphone Dashcam Telemetry",
+    "organization": "National Highways Authority of India (NHAI) & MoRTH",
+    "domain": "Smart Mobility & Transport",
+    "category": "Software",
+    "affected_group": "Commuters, state transport bus operators, and municipal highway maintenance contractors",
+    "summary": "Develop a crowd-sourced mobile vision and accelerometer system that detects potholes, estimates their depth and cubic repair volume, and generates geotagged priority repair tickets for municipal corporations.",
+    "context": "Pothole-related road accidents claimed over 4,000 lives annually in India. Current road inspections are periodic, manual, subjective, and prone to contractor dispute. NHAI requires automated surface distress profiling.",
+    "constraints": "Zero dedicated hardware sensors beyond ordinary driver smartphones mounted on dashboards. Must filter out vehicle vibration anomalies from speed breakers vs actual potholes. Strict privacy: blur all license plates and pedestrian faces on-device before sync.",
+    "required_skills": ["Computer Vision", "YOLOv8/v11", "React Native", "PostGIS", "FastAPI"],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 8.8,
+    "feasibility_notes": "High feasibility for hackathons. Teams can collect a small validation video sample around campus roads and demonstrate real-time bounding box + accelerometer bump sync.",
+    "sources": [
+      {
+        "name": "SIH 2024 MoRTH Challenge Track",
+        "url": "https://sih.gov.in",
+        "checked_date": "2026-10-20"
+      },
+      {
+        "name": "NHAI Road Safety Annual Audit",
+        "url": "https://nhai.gov.in",
+        "checked_date": "2026-08-30"
+      }
+    ],
+    "checked_date": "2026-11-18",
+    "status": "Active",
+    "hints": "Key differentiator is the sensor fusion: coupling IMU z-axis acceleration spikes with optical optical-flow bounding boxes. Pure vision fails in night or waterlogged potholes.",
+    "previous_prototypes": [
+      {
+        "team_name": "RoadGuardians",
+        "year": "2023",
+        "prototype_summary": "YOLOv5 trained on open dataset running on laptop recording webcam.",
+        "shortcoming": "Could not calculate depth or repair volume. Suffered false positives from shadows and lane markings.",
+        "repo_url": "https://github.com/example/roadguardians-pothole"
+      }
+    ],
+    "sample_solution_direction": "Dual-stream Kalman filter fusing accelerometer z-variance with YOLOv8-nano optical bbox to compute rough polygon area and volumetric asphalt ton required."
+  },
+  {
+    "id": "sih-1710",
+    "code": "SIH1710",
+    "title": "Decentralized Verification and Cold-Chain Integrity Monitoring for Primary Healthcare Vaccines and Insulin",
+    "organization": "Ministry of Health & Family Welfare",
+    "domain": "Healthcare & Biomedical",
+    "category": "Both",
+    "affected_group": "Rural Primary Health Centres (PHCs), ASHA workers, and child immunization recipients",
+    "summary": "A tamper-evident, low-cost BLE temperature data logger coupled with a cryptographic ledger verifying that temperature-sensitive vaccines remained between 2°C and 8°C throughout transit from district depots to village camps.",
+    "context": "Up to 25% of vaccines in tropical states lose potency during the last-mile ice-box transit due to melted coolant packs, with no automated log proving whether the cold chain was maintained.",
+    "constraints": "Total tag cost must be under ₹350 ($4). Battery must survive 45 days. Must synchronize with ASHA worker's ANM-OL smartphone app via offline BLE beacon broadcasts.",
+    "required_skills": ["BLE / Nordic nRF / ESP32", "Web3 / Cryptography", "Node.js", "React Native"],
+    "difficulty": "Advanced",
+    "evidence_strength": "High",
+    "builders_rating": 8.6,
+    "feasibility_notes": "Hardware team can simulate BLE temperature packets with ESP32-C3 while software team builds the mobile verifier and hash checkpoint viewer.",
+    "sources": [
+      {
+        "name": "National Health Mission - Cold Chain Guidelines",
+        "url": "https://nhm.gov.in",
+        "checked_date": "2026-09-01"
+      },
+      {
+        "name": "SIH 2024 Health Informatics Track",
+        "url": "https://sih.gov.in",
+        "checked_date": "2026-10-12"
+      }
+    ],
+    "checked_date": "2026-11-10",
+    "status": "Active",
+    "hints": "Do not build a slow public Ethereum blockchain. Use lightweight cryptographic hash chains (Merkle trees) stamped to a verifiable state channel or Hyperledger Besu instance.",
+    "previous_prototypes": [
+      {
+        "team_name": "ColdProof (SIH 2022 Finalist)",
+        "year": "2022",
+        "prototype_summary": "Arduino Uno with GSM SIM800 module transmitting temperature via HTTP every 5 minutes.",
+        "shortcoming": "Device consumed too much power (died in 4 hours), required expensive SIM cards in each vial box, and was too bulky for vaccine carriers.",
+        "repo_url": "https://github.com/example/coldproof-arduino"
+      }
+    ],
+    "sample_solution_direction": "Use ultra-low power nRF52840 broadcasting encrypted periodic beacon advertisements, logged by receiving smartphones without active pairing."
+  },
+  {
+    "id": "sih-1722",
+    "code": "SIH1722",
+    "title": "Automated AI-assisted Triage and Sign-Language Translation for Emergency Room and Telemedicine Consultations",
+    "organization": "Ministry of Social Justice and Empowerment / AICTE",
+    "domain": "Healthcare & Biomedical",
+    "category": "Software",
+    "affected_group": "Deaf and hard-of-hearing patients in emergency triage and rural telemedicine booths",
+    "summary": "Real-time, bidirectional Indian Sign Language (ISL) translator running in the browser using MediaPipe hand/pose mesh and lightweight transformers, coupled with emergency symptom triage.",
+    "context": "Over 18 million speech and hearing-impaired citizens in India face catastrophic communication barriers in emergency medical centers where trained ISL interpreters are unavailable.",
+    "constraints": "Must achieve sub-300ms latency on mid-range laptops/tablets without requiring external GPUs. Must support bidirectional: ISL gestures to speech, and doctor's voice to 3D avatar animations.",
+    "required_skills": ["MediaPipe", "TensorFlow.js", "WebRTC", "React", "NLP/Transformers"],
+    "difficulty": "Advanced",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.4,
+    "feasibility_notes": "Scope down for 36-hour hackathon to 40 core medical emergency signs (e.g. chest pain, breathing difficulty, bleeding, allergies, pain scale 1-10) rather than full dictionary.",
+    "sources": [
+      {
+        "name": "Indian Sign Language Research and Training Centre (ISLRTC)",
+        "url": "https://islrtc.nic.in",
+        "checked_date": "2026-10-05"
+      }
+    ],
+    "checked_date": "2026-11-12",
+    "status": "Active",
+    "hints": "Judges reward end-to-end flow: deaf patient gestures -> live text & voice synthesis -> doctor answers -> animated avatar signs back -> medical triage card generated.",
+    "previous_prototypes": [
+      {
+        "team_name": "SignEase",
+        "year": "2023",
+        "prototype_summary": "Static image classification of single hand alphabets A-Z using CNN.",
+        "shortcoming": "Real ISL uses dynamic motion gestures and two hands, not isolated finger-spelling. Alphabet spelling is unusable during heart attack or trauma.",
+        "repo_url": "https://github.com/example/signease-static"
+      }
+    ],
+    "sample_solution_direction": "MediaPipe holistic tracking + temporal GRU or light Transformer on normalized landmark coordinate streams."
+  },
+  {
+    "id": "sih-1804",
+    "code": "SIH1804",
+    "title": "Micro-Grid Energy Orchestration and Peer-to-Peer Solar Trading for Rural Educational Institutions",
+    "organization": "Ministry of New and Renewable Energy (MNRE)",
+    "domain": "Renewable Energy",
+    "category": "Software",
+    "affected_group": "Rural schools, colleges, and adjacent farming borewells with rooftop solar installations",
+    "summary": "An intelligent load-scheduling and virtual microgrid platform that forecasts institutional solar generation and directs excess surplus power to agricultural cold storage or local grid with automated settlement.",
+    "context": "Colleges and schools generate massive solar power on weekends and vacations which gets wasted or curtailed due to net-metering tariff disincentives, while neighboring farming pumps suffer load shedding.",
+    "constraints": "Integration with existing modbus/RS485 energy meters or smart inverter APIs. Predictive algorithm must account for regional weather forecast and historical consumption.",
+    "required_skills": ["Python", "Time Series Forecasting (Prophet/LightGBM)", "FastAPI", "React", "IoT/Modbus"],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 9.4,
+    "feasibility_notes": "Great project for beginner to intermediate teams. Can simulate solar generation data using historical solar radiation datasets (NSRDB) and show real-time dynamic switching.",
+    "sources": [
+      {
+        "name": "MNRE Rooftop Solar Scheme Documentation",
+        "url": "https://mnre.gov.in",
+        "checked_date": "2026-09-25"
+      }
+    ],
+    "checked_date": "2026-11-08",
+    "status": "Active",
+    "hints": "Simulate a live dashboard showing 3 campuses and 2 cold storage units with automated load dispatching whenever battery charges above 85%.",
+    "previous_prototypes": [
+      {
+        "team_name": "SolShare",
+        "year": "2023",
+        "prototype_summary": "Basic web dashboard displaying simulated meter readings.",
+        "shortcoming": "Had zero predictive intelligence. Only showed historical graphs without automated dispatch decisions.",
+        "repo_url": "https://github.com/example/solshare-dashboard"
+      }
+    ],
+    "sample_solution_direction": "FastAPI backend with LightGBM hourly solar irradiation forecaster + rule engine assigning surplus electricity via priority queue to agro-coolers."
+  },
+  {
+    "id": "sih-1850",
+    "code": "SIH1850",
+    "title": "Low-Cost Acoustic and Pressure Wave Pipeline Leak and Contamination Detector for Jal Jeevan Mission",
+    "organization": "Ministry of Jal Shakti",
+    "domain": "Clean Water & Sanitation",
+    "category": "Both",
+    "affected_group": "Rural village water supply committees and municipal pipe network maintenance staff",
+    "summary": "Non-invasive acoustic clamp-on sensor unit that analyzes pipe frequency harmonics to detect pinhole leaks, non-revenue water loss, and backflow contamination in drinking water lines.",
+    "context": "Over 35% of treated drinking water distributed under the Jal Jeevan Mission is lost in underground distribution pipelines before reaching tap connections, while cracked pipes suck in septic runoff during pressure drops.",
+    "constraints": "Sensor node must be non-intrusive (no cutting pipes). Cost under ₹1,200 per node. LoRaWAN transmission for 5km rural range without GSM dependency.",
+    "required_skills": ["Signal Processing", "ESP32 / LoRa", "Acoustic ML / 1D-CNN", "Python", "Leaflet GIS"],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 8.9,
+    "feasibility_notes": "Hackathon demo can use a PVC pipe with small water pump, piezoceramic disc sensor, and ESP32 streaming FFT data to a web map.",
+    "sources": [
+      {
+        "name": "Jal Jeevan Mission Guidelines & Technical Specifications",
+        "url": "https://jaljeevanmission.gov.in",
+        "checked_date": "2026-10-02"
+      }
+    ],
+    "checked_date": "2026-11-14",
+    "status": "Active",
+    "hints": "Highlight how acoustic wave propagation velocity identifies the exact leak position (within 2 meters) along a 50m pipe segment using cross-correlation between two nodes.",
+    "previous_prototypes": [
+      {
+        "team_name": "AquaSense",
+        "year": "2024",
+        "prototype_summary": "Ultrasonic flow meter installed inside the pipe line.",
+        "shortcoming": "Required municipal plumbers to cut active pipe sections, risking contamination and voiding pipe manufacturer warranties.",
+        "repo_url": "https://github.com/example/aquasense-flow"
+      }
+    ],
+    "sample_solution_direction": "Clamp-on piezoelectric contact microphone + ESP32 calculating Fast Fourier Transform (FFT) peak shift, transmitting anomalies over LoRaWAN."
+  },
+  {
+    "id": "sih-1912",
+    "code": "SIH1912",
+    "title": "Offline-First Interactive Gamified STEM Learning Platform for Multi-Grade Classrooms in Tribal Schools",
+    "organization": "Ministry of Tribal Affairs & Ministry of Education",
+    "domain": "Smart Education",
+    "category": "Software",
+    "affected_group": "First-generation tribal learners in Eklavya Model Residential Schools (EMRS) and single-teacher schools",
+    "summary": "An ultra-lightweight, zero-internet gamified science and math mastery app that runs on refurbished low-spec Android tablets with peer-to-peer Wi-Fi mesh sync for homework and teacher assessments.",
+    "context": "Internet connectivity in remote hilly and tribal settlements is erratic or non-existent. Students cannot use cloud-dependent EdTech apps like Khan Academy or Byju's.",
+    "constraints": "Zero cellular data requirement during school hours. Must function on Android 8.0 devices with 1.5GB RAM. Assets must be compressed under 40MB total. Culturally relevant folklore characters.",
+    "required_skills": ["PWA / Web Tech", "IndexedDB", "Offline First", "HTML5 Canvas / Phaser", "Flutter"],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 9.5,
+    "feasibility_notes": "Ideal for beginner student teams! Building a clean, delightful offline PWA with local SQLite/IndexedDB and Wi-Fi Direct sync can be completed cleanly in 36 hours.",
+    "sources": [
+      {
+        "name": "Ministry of Tribal Affairs EMRS Portal",
+        "url": "https://tribal.nic.in",
+        "checked_date": "2026-09-18"
+      }
+    ],
+    "checked_date": "2026-11-16",
+    "status": "Active",
+    "hints": "Demonstrate the peer-to-peer local sync: when one teacher's phone enters a cellular zone once a week, it uploads the aggregated progress batch.",
+    "previous_prototypes": [
+      {
+        "team_name": "EduBridge",
+        "year": "2023",
+        "prototype_summary": "React Native app with video lectures.",
+        "shortcoming": "App weighed 450MB and required streaming videos from AWS S3, instantly crashing when internet dropped.",
+        "repo_url": "https://github.com/example/edubridge-app"
+      }
+    ],
+    "sample_solution_direction": "Progressive Web App built with Tailwind and lightweight Canvas animations, storing game states in RxDB/IndexedDB and syncing via Wi-Fi hotspot sync."
+  },
+  {
+    "id": "sih-1930",
+    "code": "SIH1930",
+    "title": "Automated AI Forensic Tool for Deepfake Voice Clones and Audio Spoofing in Financial Social Engineering Scams",
+    "organization": "Indian Cyber Crime Coordination Centre (I4C) & MHA",
+    "domain": "Cyber Security & Defence",
+    "category": "Software",
+    "affected_group": "Elderly citizens, bank customers, and emergency financial contact respondents",
+    "summary": "Real-time acoustic spectral analysis model running on mobile or PBX gateways that detects synthetic AI voice clones (ElevenLabs/VALL-E) and warns users during incoming fraud calls.",
+    "context": "Scammers are calling parents with voice clones of their children pleading for urgent bail or hospital money. Over ₹1,200 Crores was lost in digital arrest and spoofed voice scams in 2024-2025.",
+    "constraints": "Inference within 2.5 seconds of phone call audio snippet. Must analyze phase continuity and breathing artifacts without access to original reference voices.",
+    "required_skills": ["Python", "Audio Processing (Librosa/Torchaudio)", "PyTorch", "FastAPI", "Android Telecom API"],
+    "difficulty": "Advanced",
+    "evidence_strength": "High",
+    "builders_rating": 8.7,
+    "feasibility_notes": "Students can train or fine-tune a lightweight CNN on the ASVspoof 2021 dataset and build a web-based demo where users speak vs play an ElevenLabs cloned sample.",
+    "sources": [
+      {
+        "name": "I4C National Cyber Crime Reporting Portal Advisory",
+        "url": "https://cybercrime.gov.in",
+        "checked_date": "2026-10-30"
+      }
+    ],
+    "checked_date": "2026-11-19",
+    "status": "Active",
+    "hints": "Judges want to see visual proof of detection: spectrogram comparisons showing unnatural spectral cutoffs and lack of biological glottal pulse jitter in synthetic speech.",
+    "previous_prototypes": [
+      {
+        "team_name": "FakeGuard",
+        "year": "2024",
+        "prototype_summary": "Cloud API checking audio files uploaded via a web form.",
+        "shortcoming": "Latency was 14 seconds—unusable during an ongoing active phone scam call.",
+        "repo_url": "https://github.com/example/fakeguard-audio"
+      }
+    ],
+    "sample_solution_direction": "Biquad filter + Mel-Frequency Cepstral Coefficients (MFCC) feature extraction fed to a quantized MobileNetV3 1D-spectrogram classifier."
+  }
+]
