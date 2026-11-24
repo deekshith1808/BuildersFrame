@@ -9,8 +9,14 @@
     "affected_group": "Smallholder farmers in drought-prone and delta districts with limited agronomist access",
     "summary": "Build a lightweight edge-compatible mobile/IoT scanning solution that identifies pest egg clusters and leaf blights at early onset and provides targeted, regional-language organic/chemical pesticide dosage advice.",
     "context": "Fall Armyworm and Pink Bollworm cause over 30% yield loss in cotton and maize before visible damage prompts spraying. Farmers currently over-spray blanket broad-spectrum pesticides, causing soil degradation and financial distress.",
-    "constraints": "Must work fully offline with on-device quantized model inference (TFLite/ONNX). Sensor/attachment BOM must remain under ₹800. Must support Tamil, Hindi, Telugu, and Marathi audio prompts.",
-    "required_skills": ["Python", "TensorFlow/PyTorch", "OpenCV", "Flutter", "Embedded C/ESP32"],
+    "constraints": "Must work fully offline with on-device quantized model inference (TFLite/ONNX). Sensor/attachment BOM must remain under \u20b9800. Must support Tamil, Hindi, Telugu, and Marathi audio prompts.",
+    "required_skills": [
+      "Python",
+      "TensorFlow/PyTorch",
+      "OpenCV",
+      "Flutter",
+      "Embedded C/ESP32"
+    ],
     "difficulty": "Intermediate",
     "evidence_strength": "High",
     "builders_rating": 9.1,
@@ -42,7 +48,7 @@
         "team_name": "CropLens",
         "year": "2024",
         "prototype_summary": "Raspberry Pi 4 with camera mounted on a stick with local web interface.",
-        "shortcoming": "Hardware BOM cost exceeded ₹6,500, making it unaffordable for individual smallholders; high battery consumption (2.5 hours runtime).",
+        "shortcoming": "Hardware BOM cost exceeded \u20b96,500, making it unaffordable for individual smallholders; high battery consumption (2.5 hours runtime).",
         "repo_url": "https://github.com/example/croplens-hardware-v1"
       }
     ],
@@ -59,7 +65,13 @@
     "summary": "Develop a crowd-sourced mobile vision and accelerometer system that detects potholes, estimates their depth and cubic repair volume, and generates geotagged priority repair tickets for municipal corporations.",
     "context": "Pothole-related road accidents claimed over 4,000 lives annually in India. Current road inspections are periodic, manual, subjective, and prone to contractor dispute. NHAI requires automated surface distress profiling.",
     "constraints": "Zero dedicated hardware sensors beyond ordinary driver smartphones mounted on dashboards. Must filter out vehicle vibration anomalies from speed breakers vs actual potholes. Strict privacy: blur all license plates and pedestrian faces on-device before sync.",
-    "required_skills": ["Computer Vision", "YOLOv8/v11", "React Native", "PostGIS", "FastAPI"],
+    "required_skills": [
+      "Computer Vision",
+      "YOLOv8/v11",
+      "React Native",
+      "PostGIS",
+      "FastAPI"
+    ],
     "difficulty": "Intermediate",
     "evidence_strength": "High",
     "builders_rating": 8.8,
@@ -98,10 +110,15 @@
     "domain": "Healthcare & Biomedical",
     "category": "Both",
     "affected_group": "Rural Primary Health Centres (PHCs), ASHA workers, and child immunization recipients",
-    "summary": "A tamper-evident, low-cost BLE temperature data logger coupled with a cryptographic ledger verifying that temperature-sensitive vaccines remained between 2°C and 8°C throughout transit from district depots to village camps.",
+    "summary": "A tamper-evident, low-cost BLE temperature data logger coupled with a cryptographic ledger verifying that temperature-sensitive vaccines remained between 2\u00b0C and 8\u00b0C throughout transit from district depots to village camps.",
     "context": "Up to 25% of vaccines in tropical states lose potency during the last-mile ice-box transit due to melted coolant packs, with no automated log proving whether the cold chain was maintained.",
-    "constraints": "Total tag cost must be under ₹350 ($4). Battery must survive 45 days. Must synchronize with ASHA worker's ANM-OL smartphone app via offline BLE beacon broadcasts.",
-    "required_skills": ["BLE / Nordic nRF / ESP32", "Web3 / Cryptography", "Node.js", "React Native"],
+    "constraints": "Total tag cost must be under \u20b9350 ($4). Battery must survive 45 days. Must synchronize with ASHA worker's ANM-OL smartphone app via offline BLE beacon broadcasts.",
+    "required_skills": [
+      "BLE / Nordic nRF / ESP32",
+      "Web3 / Cryptography",
+      "Node.js",
+      "React Native"
+    ],
     "difficulty": "Advanced",
     "evidence_strength": "High",
     "builders_rating": 8.6,
@@ -143,7 +160,13 @@
     "summary": "Real-time, bidirectional Indian Sign Language (ISL) translator running in the browser using MediaPipe hand/pose mesh and lightweight transformers, coupled with emergency symptom triage.",
     "context": "Over 18 million speech and hearing-impaired citizens in India face catastrophic communication barriers in emergency medical centers where trained ISL interpreters are unavailable.",
     "constraints": "Must achieve sub-300ms latency on mid-range laptops/tablets without requiring external GPUs. Must support bidirectional: ISL gestures to speech, and doctor's voice to 3D avatar animations.",
-    "required_skills": ["MediaPipe", "TensorFlow.js", "WebRTC", "React", "NLP/Transformers"],
+    "required_skills": [
+      "MediaPipe",
+      "TensorFlow.js",
+      "WebRTC",
+      "React",
+      "NLP/Transformers"
+    ],
     "difficulty": "Advanced",
     "evidence_strength": "Medium",
     "builders_rating": 8.4,
@@ -180,7 +203,13 @@
     "summary": "An intelligent load-scheduling and virtual microgrid platform that forecasts institutional solar generation and directs excess surplus power to agricultural cold storage or local grid with automated settlement.",
     "context": "Colleges and schools generate massive solar power on weekends and vacations which gets wasted or curtailed due to net-metering tariff disincentives, while neighboring farming pumps suffer load shedding.",
     "constraints": "Integration with existing modbus/RS485 energy meters or smart inverter APIs. Predictive algorithm must account for regional weather forecast and historical consumption.",
-    "required_skills": ["Python", "Time Series Forecasting (Prophet/LightGBM)", "FastAPI", "React", "IoT/Modbus"],
+    "required_skills": [
+      "Python",
+      "Time Series Forecasting (Prophet/LightGBM)",
+      "FastAPI",
+      "React",
+      "IoT/Modbus"
+    ],
     "difficulty": "Beginner",
     "evidence_strength": "High",
     "builders_rating": 9.4,
@@ -216,8 +245,14 @@
     "affected_group": "Rural village water supply committees and municipal pipe network maintenance staff",
     "summary": "Non-invasive acoustic clamp-on sensor unit that analyzes pipe frequency harmonics to detect pinhole leaks, non-revenue water loss, and backflow contamination in drinking water lines.",
     "context": "Over 35% of treated drinking water distributed under the Jal Jeevan Mission is lost in underground distribution pipelines before reaching tap connections, while cracked pipes suck in septic runoff during pressure drops.",
-    "constraints": "Sensor node must be non-intrusive (no cutting pipes). Cost under ₹1,200 per node. LoRaWAN transmission for 5km rural range without GSM dependency.",
-    "required_skills": ["Signal Processing", "ESP32 / LoRa", "Acoustic ML / 1D-CNN", "Python", "Leaflet GIS"],
+    "constraints": "Sensor node must be non-intrusive (no cutting pipes). Cost under \u20b91,200 per node. LoRaWAN transmission for 5km rural range without GSM dependency.",
+    "required_skills": [
+      "Signal Processing",
+      "ESP32 / LoRa",
+      "Acoustic ML / 1D-CNN",
+      "Python",
+      "Leaflet GIS"
+    ],
     "difficulty": "Intermediate",
     "evidence_strength": "High",
     "builders_rating": 8.9,
@@ -254,7 +289,13 @@
     "summary": "An ultra-lightweight, zero-internet gamified science and math mastery app that runs on refurbished low-spec Android tablets with peer-to-peer Wi-Fi mesh sync for homework and teacher assessments.",
     "context": "Internet connectivity in remote hilly and tribal settlements is erratic or non-existent. Students cannot use cloud-dependent EdTech apps like Khan Academy or Byju's.",
     "constraints": "Zero cellular data requirement during school hours. Must function on Android 8.0 devices with 1.5GB RAM. Assets must be compressed under 40MB total. Culturally relevant folklore characters.",
-    "required_skills": ["PWA / Web Tech", "IndexedDB", "Offline First", "HTML5 Canvas / Phaser", "Flutter"],
+    "required_skills": [
+      "PWA / Web Tech",
+      "IndexedDB",
+      "Offline First",
+      "HTML5 Canvas / Phaser",
+      "Flutter"
+    ],
     "difficulty": "Beginner",
     "evidence_strength": "High",
     "builders_rating": 9.5,
@@ -289,9 +330,15 @@
     "category": "Software",
     "affected_group": "Elderly citizens, bank customers, and emergency financial contact respondents",
     "summary": "Real-time acoustic spectral analysis model running on mobile or PBX gateways that detects synthetic AI voice clones (ElevenLabs/VALL-E) and warns users during incoming fraud calls.",
-    "context": "Scammers are calling parents with voice clones of their children pleading for urgent bail or hospital money. Over ₹1,200 Crores was lost in digital arrest and spoofed voice scams in 2024-2025.",
+    "context": "Scammers are calling parents with voice clones of their children pleading for urgent bail or hospital money. Over \u20b91,200 Crores was lost in digital arrest and spoofed voice scams in 2024-2025.",
     "constraints": "Inference within 2.5 seconds of phone call audio snippet. Must analyze phase continuity and breathing artifacts without access to original reference voices.",
-    "required_skills": ["Python", "Audio Processing (Librosa/Torchaudio)", "PyTorch", "FastAPI", "Android Telecom API"],
+    "required_skills": [
+      "Python",
+      "Audio Processing (Librosa/Torchaudio)",
+      "PyTorch",
+      "FastAPI",
+      "Android Telecom API"
+    ],
     "difficulty": "Advanced",
     "evidence_strength": "High",
     "builders_rating": 8.7,
@@ -311,10 +358,154 @@
         "team_name": "FakeGuard",
         "year": "2024",
         "prototype_summary": "Cloud API checking audio files uploaded via a web form.",
-        "shortcoming": "Latency was 14 seconds—unusable during an ongoing active phone scam call.",
+        "shortcoming": "Latency was 14 seconds\u2014unusable during an ongoing active phone scam call.",
         "repo_url": "https://github.com/example/fakeguard-audio"
       }
     ],
     "sample_solution_direction": "Biquad filter + Mel-Frequency Cepstral Coefficients (MFCC) feature extraction fed to a quantized MobileNetV3 1D-spectrogram classifier."
+  },
+  {
+    "id": "shaastra-2501",
+    "code": "SH2501",
+    "title": "Real-time Non-Invasive EEG Signal Decoding for Brain-Computer Interface (BCI) Assistive Communication",
+    "organization": "Shaastra IIT Madras & Centre for Brain Research (NeuroHack)",
+    "domain": "Healthcare & Biomedical",
+    "category": "Both",
+    "affected_group": "ALS, locked-in syndrome, and severe motor-neuron disorder patients",
+    "summary": "Develop an ultra-low-latency on-device signal processing and neural network pipeline that decodes 8-channel EEG motor-imagery signals into alphanumeric text and robotic wheelchair steering prompts.",
+    "context": "Traditional motor-imagery BCI systems suffer from high inter-session signal drift and latency exceeding 600ms. Patients require reliable assistive typing without exhausting recalibration routines.",
+    "constraints": "Must infer under 120ms per epoch on standard x86/ARM hardware. Artifact filtering must eliminate ocular blinks (EOG) and jaw clenches (EMG). Open-source BCI hardware (OpenBCI Cyton) compatible.",
+    "required_skills": [
+      "Python",
+      "PyTorch/TensorFlow",
+      "MNE-Python",
+      "Signal Processing (FFT/Wavelets)",
+      "Flutter/React"
+    ],
+    "difficulty": "Advanced",
+    "evidence_strength": "High",
+    "builders_rating": 9.4,
+    "feasibility_notes": "PhysioNet EEG Motor Movement/Imagery Dataset and BCI Competition IV datasets are publicly available. 36-hr prototype can demonstrate live simulated stream playback + real-time classification.",
+    "sources": [
+      {
+        "name": "Shaastra NeuroHack Problem Statement Guidelines",
+        "url": "https://shaastra.org",
+        "checked_date": "2026-11-20"
+      },
+      {
+        "name": "PhysioNet EEG Motor Movement Database",
+        "url": "https://physionet.org",
+        "checked_date": "2026-10-15"
+      }
+    ],
+    "checked_date": "2026-11-23",
+    "status": "Active",
+    "hints": "Judges prioritize artifact suppression algorithms (ICA/CSP) and transfer learning across subjects over complex transformer models with excessive compute overhead.",
+    "previous_prototypes": [
+      {
+        "team_name": "CortexComm (Shaastra 2024 Finalist)",
+        "year": "2024",
+        "prototype_summary": "EEG classifier using 1D-CNN hosted on cloud Flask server.",
+        "shortcoming": "Cloud latency reached 850ms making typing frustrating; lacked subject-adaptation.",
+        "repo_url": "https://github.com/example/cortexcomm-bci-prototype"
+      }
+    ],
+    "sample_solution_direction": "Combine Common Spatial Patterns (CSP) spatial filtering with a lightweight EEGNet architecture running quantized ONNX on local device."
+  },
+  {
+    "id": "shaastra-2502",
+    "code": "SH2502",
+    "title": "Autonomous 3D LiDAR-Inertial SLAM and Dynamic Obstacle Avoidance for Industrial AGVs in GPS-Denied Warehouses",
+    "organization": "Caterpillar Inc. & Shaastra Autonomous Systems Lab",
+    "domain": "Smart Mobility",
+    "category": "Both",
+    "affected_group": "Factory floor workers, logistics operators, and heavy machinery facilities",
+    "summary": "Engineer an onboard sensor fusion pipeline combining 3D LiDAR point clouds and 6-DOF IMU telemetry to achieve centimeter-accurate mapping and real-time obstacle avoidance around moving forklifts and personnel.",
+    "context": "GPS signals cannot penetrate steel-reinforced warehouse structures. Traditional 2D LiDAR fails when pallets or reflective shrink-wraps distort 2D planar scans, leading to AGV route aborts.",
+    "constraints": "Must operate in real-time at >= 15Hz on an embedded compute unit (NVIDIA Jetson Orin Nano). Maximum localization drift under 3cm per 100 meters traveled.",
+    "required_skills": [
+      "C++",
+      "ROS 2 (Humble)",
+      "Point Cloud Library (PCL)",
+      "Gazebo Simulation",
+      "Python"
+    ],
+    "difficulty": "Advanced",
+    "evidence_strength": "High",
+    "builders_rating": 9.3,
+    "feasibility_notes": "Simulated warehouse world models in Gazebo are readily available. Participants can benchmark FAST-LIO2 or LIO-SAM against simulated ground truth.",
+    "sources": [
+      {
+        "name": "Caterpillar Autonomy Challenge Problem Archive",
+        "url": "https://shaastra.org",
+        "checked_date": "2026-11-18"
+      },
+      {
+        "name": "IEEE Robotics and Automation Society",
+        "url": "https://ieee-ras.org",
+        "checked_date": "2026-09-02"
+      }
+    ],
+    "checked_date": "2026-11-23",
+    "status": "Active",
+    "hints": "Focus on graceful degradation during degenerate geometries (long narrow featureless corridors). Implement adaptive costmaps.",
+    "previous_prototypes": [
+      {
+        "team_name": "RoboNav (Caterpillar Challenge 2024)",
+        "year": "2024",
+        "prototype_summary": "Cartographer 2D SLAM running on Raspberry Pi 4.",
+        "shortcoming": "Lost tracking completely when turning corners around stacked pallets; high computational lag.",
+        "repo_url": "https://github.com/example/robonav-caterpillar-slam"
+      }
+    ],
+    "sample_solution_direction": "Implement an iterated error-state Kalman filter (FAST-LIO2) with OctoMap dynamic voxel filtering and Nav2 trajectory controllers in ROS 2."
+  },
+  {
+    "id": "shaastra-2503",
+    "code": "SH2503",
+    "title": "Decentralized Acoustic Pipeline Leak Localization and Autonomous Pressure Regulation for Municipal Water Grids",
+    "organization": "Shaastra Future Cities & Chennai Metropolitan Water Supply",
+    "domain": "Clean & Green Technology",
+    "category": "Both",
+    "affected_group": "Metro water authorities, urban residents facing non-revenue water loss (NRW)",
+    "summary": "Deploy low-cost hydrophone acoustic edge nodes to detect underground micro-bursts and cavitation anomalies in distribution lines before sinkhole formation occurs.",
+    "context": "Indian metropolitan cities lose between 35% to 45% of treated drinking water to hidden underground leaks. Current manual acoustic correlators are labor-intensive and only deployed after major surfacing leaks.",
+    "constraints": "Node BOM must remain under \u20b91,200. Battery life minimum 18 months via solar trickle. Wireless telemetry via LoRaWAN up to 3km radius.",
+    "required_skills": [
+      "Python",
+      "Digital Signal Processing (DSP)",
+      "TinyML / Edge Impulse",
+      "LoRaWAN",
+      "FastAPI/React"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 9.1,
+    "feasibility_notes": "Synthesized acoustic water pipe leak frequency datasets (hydrophone recordings at 50Hz-2kHz) are accessible for rapid model training.",
+    "sources": [
+      {
+        "name": "Shaastra IndustriAI Research & Future Cities Summit",
+        "url": "https://shaastra.org",
+        "checked_date": "2026-11-20"
+      },
+      {
+        "name": "Jal Jeevan Mission Technical Manual on Smart Water Grids",
+        "url": "https://jaljeevanmission.gov.in",
+        "checked_date": "2026-10-10"
+      }
+    ],
+    "checked_date": "2026-11-23",
+    "status": "Active",
+    "hints": "Focus on cross-correlation delay estimation between two adjacent pipe nodes to pinpoint leak coordinates to within 1.5 meters.",
+    "previous_prototypes": [
+      {
+        "team_name": "AquaSense (TNSI 2024)",
+        "year": "2024",
+        "prototype_summary": "GSM-based pressure sensor logging to Google Sheets.",
+        "shortcoming": "GSM module drained 12V lead-acid battery within 3 weeks; pressure thresholding generated 60% false alarms during normal valve cycling.",
+        "repo_url": "https://github.com/example/aquasense-gsm-leak"
+      }
+    ],
+    "sample_solution_direction": "Piezoelectric contact microphone + TinyML 1D convolutional spectrogram classifier on ESP32-S3 reporting anomalous energy bands via LoRaWAN."
   }
 ]

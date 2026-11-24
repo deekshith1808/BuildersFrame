@@ -52,6 +52,7 @@ async function initApp() {
   initSpotlights();
   init3DTilt();
   initHeroMeshCanvas();
+  init3DMacbookScene();
   initTypewriterSearch();
   updateFinderMatchCount();
   animateStatsNumbers();
@@ -115,6 +116,12 @@ function updateNavIndicator() {
   indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
   indicator.style.width = `${activeBtn.offsetWidth}px`;
   indicator.style.opacity = '1';
+
+  // Smoothly center active tab in horizontal scroll on mobile/tablet
+  if (nav.scrollWidth > nav.clientWidth) {
+    const scrollTarget = activeBtn.offsetLeft - (nav.clientWidth / 2) + (activeBtn.offsetWidth / 2);
+    nav.scrollTo({ left: Math.max(0, scrollTarget), behavior: 'smooth' });
+  }
 }
 
 function initSpotlights() {
@@ -2153,3 +2160,859 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// ====================================================
+// 3D MACBOOK OPENING SCENE & DYNAMIC TERMINAL ENGINE
+// (Procedural Three.js Model, Dynamic CanvasTexture)
+// ====================================================
+
+let macbookSceneState = {
+  initialized: false,
+  scene: null,
+  camera: null,
+  renderer: null,
+  laptopGroup: null,
+  lidPivot: null,
+  screenMesh: null,
+  screenTexture: null,
+  screenCanvas: null,
+  screenCtx: null,
+  screenLight: null,
+  lidAngle: 0.0, // starts completely closed for cinematic opening intro
+  targetLidAngle: 1.885, // ~108 degrees open (optimal display viewing)
+  isLidOpen: true,
+  isDragging: false,
+  lastMouse: { x: 0, y: 0 },
+  currentRot: { x: 0.22, y: -0.32 },
+  targetRot: { x: 0.22, y: -0.32 },
+  parallax: { x: 0, y: 0 },
+  targetParallax: { x: 0, y: 0 },
+  auditMode: false,
+  auditProgress: 0,
+  auditLogs: [],
+  auditTimer: null,
+  lastTime: 0
+};
+
+function init3DMacbookScene() {
+  if (macbookSceneState.initialized) return;
+
+  const canvas = document.getElementById('macbook3DCanvas');
+  const container = document.getElementById('macbookCanvasWrapper');
+  if (!canvas || !container) return;
+
+  if (typeof THREE === 'undefined') {
+    console.warn('[BuildersFrame 3D] Three.js not yet loaded. Will retry...');
+    setTimeout(init3DMacbookScene, 200);
+    return;
+  }
+
+  macbookSceneState.initialized = true;
+
+  // 1. Scene, Camera & Renderer
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 460;
+
+  const scene = new THREE.Scene();
+  macbookSceneState.scene = scene;
+
+  const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+  camera.position.set(0, 1.8, 6.2);
+  camera.lookAt(0, 0.5, 0);
+  macbookSceneState.camera = camera;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  macbookSceneState.renderer = renderer;
+
+  // 2. Lighting Setup
+  // Ambient fill light matching warm ivory theme
+  const ambientLight = new THREE.AmbientLight(0xFAF9EF, 1.4);
+  scene.add(ambientLight);
+
+  // Key light from top right
+  const keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.6);
+  keyLight.position.set(5, 7, 6);
+  scene.add(keyLight);
+
+  // Soft sage accent fill from left
+  const sageFillLight = new THREE.DirectionalLight(0xA3B19C, 0.9);
+  sageFillLight.position.set(-6, 3, -2);
+  scene.add(sageFillLight);
+
+  // Bottom soft bounce
+  const bounceLight = new THREE.DirectionalLight(0xDDD0C1, 0.5);
+  bounceLight.position.set(0, -4, 4);
+  scene.add(bounceLight);
+
+  // 3. Laptop Master Group
+  const laptopGroup = new THREE.Group();
+  laptopGroup.position.set(0, -0.45, 0);
+  laptopGroup.rotation.set(macbookSceneState.currentRot.x, macbookSceneState.currentRot.y, 0);
+  scene.add(laptopGroup);
+  macbookSceneState.laptopGroup = laptopGroup;
+
+  // 4. Aluminum Materials
+  const aluminumMaterial = new THREE.MeshStandardMaterial({
+    color: 0xD4D8DE,
+    metalness: 0.84,
+    roughness: 0.24
+  });
+
+  const darkAccentMaterial = new THREE.MeshStandardMaterial({
+    color: 0x181A1D,
+    metalness: 0.5,
+    roughness: 0.5
+  });
+
+  // 5. Build Base Chassis
+  buildMacbookBase(laptopGroup, aluminumMaterial, darkAccentMaterial);
+
+  // 6. Build Lid & Dynamic Screen
+  buildMacbookLid(laptopGroup, aluminumMaterial);
+
+  // 7. Interaction & Event Handlers
+  setupMacbookInteraction(canvas, container);
+
+  // 8. Spatial Holographic Chip Clicks
+  setupSpatialChips();
+
+  // 9. Resize Observer
+  window.addEventListener('resize', onMacbookResize);
+  onMacbookResize();
+
+  // 10. Start Animation Loop
+  requestAnimationFrame(animateMacbookScene);
+}
+
+function buildMacbookBase(laptopGroup, aluminumMaterial, darkAccentMaterial) {
+  // Main Unibody Aluminum Base: Width 3.6, Height 0.13, Depth 2.45
+  const baseGeo = new THREE.BoxGeometry(3.6, 0.13, 2.45);
+  const baseMesh = new THREE.Mesh(baseGeo, aluminumMaterial);
+  baseMesh.position.set(0, 0, 0);
+  laptopGroup.add(baseMesh);
+
+  // Bottom Taper Plate (Apple unibody contour)
+  const bottomTaperGeo = new THREE.BoxGeometry(3.42, 0.04, 2.3);
+  const bottomTaperMaterial = new THREE.MeshStandardMaterial({
+    color: 0xBFC4CA,
+    metalness: 0.8,
+    roughness: 0.35
+  });
+  const bottomTaper = new THREE.Mesh(bottomTaperGeo, bottomTaperMaterial);
+  bottomTaper.position.set(0, -0.07, 0);
+  laptopGroup.add(bottomTaper);
+
+  // 4 Rubber Non-slip Feet
+  const footGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.03, 16);
+  const footMat = new THREE.MeshBasicMaterial({ color: 0x1E2024 });
+  const footPositions = [
+    [-1.5, -0.09, -0.95],
+    [1.5, -0.09, -0.95],
+    [-1.5, -0.09, 0.95],
+    [1.5, -0.09, 0.95]
+  ];
+  footPositions.forEach(pos => {
+    const foot = new THREE.Mesh(footGeo, footMat);
+    foot.position.set(pos[0], pos[1], pos[2]);
+    laptopGroup.add(foot);
+  });
+
+  // Keyboard Deck Recess
+  const keyboardWellGeo = new THREE.BoxGeometry(3.08, 0.005, 1.34);
+  const keyboardTexture = generateKeyboardTexture();
+  const keyboardDeckMat = new THREE.MeshStandardMaterial({
+    map: keyboardTexture,
+    metalness: 0.25,
+    roughness: 0.65
+  });
+  const keyboardDeck = new THREE.Mesh(keyboardWellGeo, keyboardDeckMat);
+  keyboardDeck.position.set(0, 0.066, -0.32);
+  laptopGroup.add(keyboardDeck);
+
+  // Trackpad
+  const trackpadGeo = new THREE.BoxGeometry(1.24, 0.004, 0.84);
+  const trackpadMat = new THREE.MeshStandardMaterial({
+    color: 0xCACED4,
+    metalness: 0.62,
+    roughness: 0.38
+  });
+  const trackpad = new THREE.Mesh(trackpadGeo, trackpadMat);
+  trackpad.position.set(0, 0.066, 0.68);
+  laptopGroup.add(trackpad);
+
+  // Front Thumb Opening Lip Notch
+  const notchGeo = new THREE.BoxGeometry(0.55, 0.03, 0.04);
+  const notchMat = new THREE.MeshBasicMaterial({ color: 0x9AA0A6 });
+  const notch = new THREE.Mesh(notchGeo, notchMat);
+  notch.position.set(0, 0.055, 1.22);
+  laptopGroup.add(notch);
+
+  // Rear Cylindrical Hinge
+  const hingeGeo = new THREE.CylinderGeometry(0.045, 0.045, 2.75, 16);
+  const hingeMat = new THREE.MeshStandardMaterial({
+    color: 0x222428,
+    metalness: 0.7,
+    roughness: 0.4
+  });
+  const hinge = new THREE.Mesh(hingeGeo, hingeMat);
+  hinge.rotation.z = Math.PI / 2;
+  hinge.position.set(0, 0.065, -1.22);
+  laptopGroup.add(hinge);
+}
+
+function buildMacbookLid(laptopGroup, aluminumMaterial) {
+  // Hinge Pivot Group (Rotates along X axis at the rear edge)
+  const lidPivot = new THREE.Group();
+  lidPivot.position.set(0, 0.065, -1.22);
+  laptopGroup.add(lidPivot);
+  macbookSceneState.lidPivot = lidPivot;
+
+  // Initially closed: rotation.x = 0
+  lidPivot.rotation.x = -macbookSceneState.lidAngle;
+
+  // Back Outer Lid Shell (Aluminum Unibody)
+  // Relative to hinge at (0, 0, 0), extends +Z from 0 to 2.45
+  const lidShellGeo = new THREE.BoxGeometry(3.6, 0.08, 2.45);
+  const lidShell = new THREE.Mesh(lidShellGeo, aluminumMaterial);
+  lidShell.position.set(0, 0.04, 1.225);
+  lidPivot.add(lidShell);
+
+  // Glowing BuildersFrame Emblem on back of lid
+  const logoGeo = new THREE.CircleGeometry(0.26, 32);
+  const logoMat = new THREE.MeshBasicMaterial({
+    color: 0xFAF9EF,
+    side: THREE.DoubleSide
+  });
+  const logoMesh = new THREE.Mesh(logoGeo, logoMat);
+  logoMesh.rotation.x = -Math.PI / 2;
+  logoMesh.position.set(0, 0.082, 1.225);
+  lidPivot.add(logoMesh);
+
+  // Inner Black Display Bezel
+  const bezelGeo = new THREE.BoxGeometry(3.54, 0.005, 2.39);
+  const bezelMat = new THREE.MeshBasicMaterial({ color: 0x07080A });
+  const bezel = new THREE.Mesh(bezelGeo, bezelMat);
+  bezel.position.set(0, -0.002, 1.225);
+  lidPivot.add(bezel);
+
+  // Top Camera Notch / Sensor
+  const cameraNotchGeo = new THREE.BoxGeometry(0.35, 0.006, 0.06);
+  const cameraNotchMat = new THREE.MeshBasicMaterial({ color: 0x121417 });
+  const cameraNotch = new THREE.Mesh(cameraNotchGeo, cameraNotchMat);
+  cameraNotch.position.set(0, -0.004, 2.38);
+  lidPivot.add(cameraNotch);
+
+  // Dynamic High-Resolution Screen Canvas & Texture
+  const screenCanvas = document.createElement('canvas');
+  screenCanvas.width = 1024;
+  screenCanvas.height = 640;
+  macbookSceneState.screenCanvas = screenCanvas;
+  macbookSceneState.screenCtx = screenCanvas.getContext('2d');
+
+  const screenTexture = new THREE.CanvasTexture(screenCanvas);
+  screenTexture.minFilter = THREE.LinearFilter;
+  screenTexture.magFilter = THREE.LinearFilter;
+  macbookSceneState.screenTexture = screenTexture;
+
+  // Initial draw on the screen
+  renderTerminalScreen(0);
+
+  // Screen Plane Mesh
+  // PlaneGeometry lies in XY. With rotation.x = Math.PI / 2, normal points -Y (faces keyboard when closed, faces viewer when open)
+  const screenGeo = new THREE.PlaneGeometry(3.34, 2.15);
+  const screenMat = new THREE.MeshBasicMaterial({
+    map: screenTexture,
+    side: THREE.DoubleSide
+  });
+  const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+  screenMesh.rotation.x = Math.PI / 2;
+  screenMesh.position.set(0, -0.005, 1.225);
+  lidPivot.add(screenMesh);
+  macbookSceneState.screenMesh = screenMesh;
+
+  // Soft Terminal Display Glow Light onto Keyboard
+  const screenLight = new THREE.PointLight(0xA3B19C, 0.85, 4.5);
+  screenLight.position.set(0, 0.2, 1.225);
+  lidPivot.add(screenLight);
+  macbookSceneState.screenLight = screenLight;
+}
+
+function generateKeyboardTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 460;
+  const ctx = canvas.getContext('2d');
+
+  // Dark brushed aluminum base
+  ctx.fillStyle = '#17191C';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Keyboard Rows Layout
+  const keyRows = [
+    // Fn row (14 keys)
+    { count: 14, height: 34, gap: 6, y: 16, keyLabels: ['esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', '⌽'] },
+    // Number row (14 keys)
+    { count: 14, height: 58, gap: 6, y: 56, keyLabels: ['~', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete'] },
+    // QWERTY row (14 keys)
+    { count: 14, height: 58, gap: 6, y: 120, keyLabels: ['tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'] },
+    // ASDF row (13 keys)
+    { count: 13, height: 58, gap: 6, y: 184, keyLabels: ['caps', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'", 'return'] },
+    // ZXCV row (12 keys)
+    { count: 12, height: 58, gap: 6, y: 248, keyLabels: ['shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 'shift'] },
+    // Bottom Spacebar row
+    { count: 8, height: 62, gap: 6, y: 312, custom: true }
+  ];
+
+  keyRows.forEach(row => {
+    if (row.custom) {
+      // Spacebar row
+      const y = row.y;
+      const h = row.height;
+      const keys = [
+        { label: 'fn', w: 68 },
+        { label: 'control', w: 76 },
+        { label: 'option', w: 78 },
+        { label: 'command', w: 96 },
+        { label: 'BuildersFrame', w: 340, isSpace: true },
+        { label: 'command', w: 96 },
+        { label: 'option', w: 78 },
+        { label: '◄ ▲ ▼ ►', w: 120 }
+      ];
+      let curX = 20;
+      keys.forEach(k => {
+        drawKeyCap(ctx, curX, y, k.w, h, k.label, k.isSpace);
+        curX += k.w + 6;
+      });
+    } else {
+      const totalWidth = 984;
+      const keyWidth = (totalWidth - (row.count - 1) * row.gap) / row.count;
+      let curX = 20;
+      for (let i = 0; i < row.count; i++) {
+        const label = row.keyLabels[i] || '';
+        drawKeyCap(ctx, curX, row.y, keyWidth, row.height, label);
+        curX += keyWidth + row.gap;
+      }
+    }
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  return texture;
+}
+
+function drawKeyCap(ctx, x, y, w, h, label, isSpace = false) {
+  // Key cap background with subtle 3D bevel
+  ctx.fillStyle = '#22252A';
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 6);
+  ctx.fill();
+
+  ctx.strokeStyle = '#2F343B';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Key Top Highlight
+  ctx.fillStyle = '#2A2E35';
+  ctx.beginPath();
+  ctx.roundRect(x + 2, y + 2, w - 4, h - 5, 4);
+  ctx.fill();
+
+  // Label text
+  ctx.fillStyle = isSpace ? '#7D9173' : '#AEB4BD';
+  ctx.font = isSpace ? 'bold 12px "SF Pro", sans-serif' : '10px "SF Pro", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2 - 1);
+}
+
+// ----------------------------------------------------
+// Terminal Canvas Screen Rendering (BuildersFrame OS)
+// ----------------------------------------------------
+function renderTerminalScreen(time) {
+  const ctx = macbookSceneState.screenCtx;
+  const canvas = macbookSceneState.screenCanvas;
+  if (!ctx || !canvas) return;
+
+  // Obsidian Dark Background with Forest Sage Tint
+  ctx.fillStyle = '#0B100E';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Subtle Scanline Effect
+  ctx.fillStyle = 'rgba(163, 177, 156, 0.025)';
+  for (let y = 0; y < canvas.height; y += 4) {
+    ctx.fillRect(0, y, canvas.width, 2);
+  }
+
+  // 1. macOS Top Window Bar
+  ctx.fillStyle = '#141A17';
+  ctx.fillRect(0, 0, canvas.width, 42);
+
+  ctx.strokeStyle = '#222E27';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 42);
+  ctx.lineTo(canvas.width, 42);
+  ctx.stroke();
+
+  // Traffic Light Window Controls
+  // Red Close
+  ctx.fillStyle = '#FF5F56';
+  ctx.beginPath();
+  ctx.arc(26, 21, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Yellow Minimize
+  ctx.fillStyle = '#FFBD2E';
+  ctx.beginPath();
+  ctx.arc(46, 21, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Green Expand
+  ctx.fillStyle = '#27C93F';
+  ctx.beginPath();
+  ctx.arc(66, 21, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Title in Window Center
+  ctx.fillStyle = '#A3B19C';
+  ctx.font = '600 13px "SF Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('BuildersFrame OS — Hackathon Problem Forensics & Audit Terminal v2.4', canvas.width / 2, 26);
+
+  // Live Status Badge at Top Right
+  ctx.fillStyle = '#223828';
+  ctx.beginPath();
+  ctx.roundRect(canvas.width - 150, 10, 126, 22, 11);
+  ctx.fill();
+  ctx.fillStyle = '#4ADE80';
+  ctx.beginPath();
+  ctx.arc(canvas.width - 138, 21, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#C8D6C3';
+  ctx.font = '10px "SF Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('SYSTEM ONLINE', canvas.width - 128, 25);
+
+  // 2. Terminal Content
+  ctx.textAlign = 'left';
+  let curY = 72;
+
+  // Command Prompt
+  ctx.font = 'bold 15px "SF Mono", monospace';
+  ctx.fillStyle = '#FAF9EF';
+  ctx.fillText('builder@kpriet-macbook:~$', 32, curY);
+  ctx.fillStyle = '#A3B19C';
+  ctx.fillText(' buildersframe audit --challenge SIH1601 --live-eval', 245, curY);
+
+  curY += 28;
+
+  // Thin separator line
+  ctx.strokeStyle = '#1E2B23';
+  ctx.beginPath();
+  ctx.moveTo(32, curY);
+  ctx.lineTo(canvas.width - 32, curY);
+  ctx.stroke();
+
+  curY += 26;
+
+  // Core Intelligence Badges
+  const telemetry = [
+    { tag: '[INIT]', color: '#A3B19C', text: 'AICTE / MoE Official Ground-Truth Verified (SHA-256: 8f4b...19c2)' },
+    { tag: '[STATEMENT]', color: '#DDD0C1', text: 'SIH1601 • Smart Agro Vision: Foliage Disease Detection & Soil Moisture' },
+    { tag: '[TECH-STACK]', color: '#7EC8E3', text: 'Optimal Match: PyTorch Mobile + Edge TPU + FastAPI + SQLite Vector Index' },
+    { tag: '[PRIOR-ART]', color: '#E0A96D', text: '14 Prior Prototypes Audited • 0 Direct Licensing / IP Conflicts' },
+    { tag: '[COLLAB]', color: '#C5B5A3', text: 'Hub Matches: 3 Teams in Coimbatore & Chennai actively seeking Embedded Eng.' }
+  ];
+
+  ctx.font = '13px "SF Mono", monospace';
+  telemetry.forEach(item => {
+    ctx.fillStyle = item.color;
+    ctx.fillText(item.tag, 32, curY);
+    ctx.fillStyle = '#E5EBE2';
+    ctx.fillText(item.text, 142, curY);
+    curY += 24;
+  });
+
+  curY += 12;
+
+  // 3. Feasibility Metric Card
+  ctx.fillStyle = '#121A16';
+  ctx.beginPath();
+  ctx.roundRect(32, curY, canvas.width - 64, 95, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#24362B';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Progress Bar Title
+  ctx.fillStyle = '#FAF9EF';
+  ctx.font = 'bold 13px "SF Mono", monospace';
+  ctx.fillText('36-HOUR SPRINT FEASIBILITY INDEX:', 50, curY + 28);
+
+  ctx.fillStyle = '#A3B19C';
+  ctx.font = 'bold 14px "SF Mono", monospace';
+  ctx.fillText('96.4% VERIFIED', canvas.width - 170, curY + 28);
+
+  // Background Bar
+  const barX = 50;
+  const barY = curY + 38;
+  const barW = canvas.width - 100;
+  const barH = 14;
+
+  ctx.fillStyle = '#1D2A22';
+  ctx.beginPath();
+  ctx.roundRect(barX, barY, barW, barH, 7);
+  ctx.fill();
+
+  // Active Fill Bar with Sage Gradient
+  const fillGrad = ctx.createLinearGradient(barX, barY, barX + barW * 0.964, barY);
+  fillGrad.addColorStop(0, '#5A7352');
+  fillGrad.addColorStop(1, '#A3B19C');
+
+  ctx.fillStyle = fillGrad;
+  ctx.beginPath();
+  ctx.roundRect(barX, barY, barW * 0.964, barH, 7);
+  ctx.fill();
+
+  // Chips under Progress Bar
+  ctx.font = '11px "SF Mono", monospace';
+  ctx.fillStyle = '#A3B19C';
+  ctx.fillText('✓ BOM Budget < ₹4,500', 50, curY + 76);
+  ctx.fillText('✓ Zero-Cloud Offline Inference', 250, curY + 76);
+  ctx.fillText('✓ Live Edge TPU Acceleration', 495, curY + 76);
+  ctx.fillText('✓ Prior-Art Patented Clean', 735, curY + 76);
+
+  curY += 120;
+
+  // 4. Live Terminal Audit Output / Simulation Stream
+  if (macbookSceneState.auditMode && macbookSceneState.auditLogs.length > 0) {
+    ctx.fillStyle = '#17241C';
+    ctx.beginPath();
+    ctx.roundRect(32, curY, canvas.width - 64, 130, 8);
+    ctx.fill();
+
+    let logY = curY + 24;
+    macbookSceneState.auditLogs.forEach((log) => {
+      ctx.fillStyle = log.color || '#A3B19C';
+      ctx.font = '12px "SF Mono", monospace';
+      ctx.fillText(log.text, 50, logY);
+      logY += 22;
+    });
+
+    curY += 140;
+  } else {
+    // Standard prompt awaiting instructions
+    ctx.fillStyle = '#A3B19C';
+    ctx.font = '13px "SF Mono", monospace';
+    ctx.fillText('>> Verdict: AICTE SIH1601 is prime candidate for collegiate hackathon win.', 32, curY);
+
+    curY += 24;
+
+    ctx.fillStyle = '#FAF9EF';
+    ctx.fillText('builder@kpriet-macbook:~$', 32, curY);
+
+    // Blinking Cursor █
+    const showCursor = Math.floor(time / 500) % 2 === 0;
+    if (showCursor) {
+      ctx.fillStyle = '#A3B19C';
+      ctx.fillText('█', 245, curY);
+    }
+  }
+
+  // Update Three.js Texture
+  if (macbookSceneState.screenTexture) {
+    macbookSceneState.screenTexture.needsUpdate = true;
+  }
+}
+
+// ----------------------------------------------------
+// Animation Frame Loop
+// ----------------------------------------------------
+function animateMacbookScene(timestamp) {
+  requestAnimationFrame(animateMacbookScene);
+
+  const state = macbookSceneState;
+  if (!state.scene || !state.camera || !state.renderer) return;
+
+  // 1. Smooth Lid Opening Ease (from 0 to ~108 degrees)
+  const angleDelta = state.targetLidAngle - state.lidAngle;
+  if (Math.abs(angleDelta) > 0.0005) {
+    state.lidAngle += angleDelta * 0.045;
+    if (state.lidPivot) {
+      state.lidPivot.rotation.x = -state.lidAngle;
+    }
+
+    // Update screen glow light intensity as lid opens
+    if (state.screenLight) {
+      state.screenLight.intensity = Math.min(1.2, state.lidAngle * 0.65);
+    }
+  }
+
+  // 2. Smooth 3D Rotation & Parallax Inertia
+  state.parallax.x += (state.targetParallax.x - state.parallax.x) * 0.08;
+  state.parallax.y += (state.targetParallax.y - state.parallax.y) * 0.08;
+
+  state.currentRot.x += (state.targetRot.x + state.parallax.x - state.currentRot.x) * 0.08;
+  state.currentRot.y += (state.targetRot.y + state.parallax.y - state.currentRot.y) * 0.08;
+
+  if (state.laptopGroup) {
+    state.laptopGroup.rotation.x = state.currentRot.x;
+    state.laptopGroup.rotation.y = state.currentRot.y;
+  }
+
+  // 3. Render Dynamic Screen Content (Blinking cursor / logs)
+  renderTerminalScreen(timestamp);
+
+  // 4. Render Scene
+  state.renderer.render(state.scene, state.camera);
+}
+
+// ----------------------------------------------------
+// Interactive Mouse & Touch Drag Controls
+// ----------------------------------------------------
+function setupMacbookInteraction(canvas, container) {
+  const state = macbookSceneState;
+
+  // Mouse Down / Touch Start
+  function handleStart(clientX, clientY) {
+    state.isDragging = true;
+    state.lastMouse.x = clientX;
+    state.lastMouse.y = clientY;
+    container.style.cursor = 'grabbing';
+  }
+
+  // Mouse Move / Touch Move
+  function handleMove(clientX, clientY, isTouch = false) {
+    if (state.isDragging) {
+      const deltaX = clientX - state.lastMouse.x;
+      const deltaY = clientY - state.lastMouse.y;
+
+      state.targetRot.y += deltaX * 0.007;
+      state.targetRot.x += deltaY * 0.007;
+
+      // Clamp vertical tilt to prevent unnatural flipping
+      state.targetRot.x = Math.max(-0.1, Math.min(0.72, state.targetRot.x));
+
+      state.lastMouse.x = clientX;
+      state.lastMouse.y = clientY;
+    } else if (!isTouch) {
+      // Gentle parallax tilt following cursor
+      const rect = container.getBoundingClientRect();
+      const normX = (clientX - rect.left) / rect.width;
+      const normY = (clientY - rect.top) / rect.height;
+
+      state.targetParallax.y = (normX - 0.5) * 0.22;
+      state.targetParallax.x = (normY - 0.5) * 0.14;
+
+      // Counter-parallax shift on floating chips
+      shiftFloatingChips(normX - 0.5, normY - 0.5);
+    }
+  }
+
+  function handleEnd() {
+    state.isDragging = false;
+    container.style.cursor = 'grab';
+  }
+
+  // Mouse Events
+  container.addEventListener('mousedown', (e) => handleStart(e.clientX, e.clientY));
+  window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY, false));
+  window.addEventListener('mouseup', handleEnd);
+  container.addEventListener('mouseleave', () => {
+    state.targetParallax.x = 0;
+    state.targetParallax.y = 0;
+    shiftFloatingChips(0, 0);
+  });
+
+  // Touch Events for Mobile / Tablet Responsiveness
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1 && state.isDragging) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY, true);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', handleEnd);
+}
+
+function shiftFloatingChips(offsetX, offsetY) {
+  const chips = document.querySelectorAll('.floating-spatial-chip');
+  chips.forEach((chip, i) => {
+    const factor = (i % 2 === 0 ? 1 : -1) * 14;
+    chip.style.transform = `translate(${offsetX * factor}px, ${offsetY * factor}px)`;
+  });
+}
+
+function setupSpatialChips() {
+  const chip1 = document.getElementById('spatialChip1');
+  const chip2 = document.getElementById('spatialChip2');
+  const chip3 = document.getElementById('spatialChip3');
+  const chip4 = document.getElementById('spatialChip4');
+
+  if (chip1) {
+    chip1.addEventListener('click', () => {
+      switchView('discovery');
+      const input = document.getElementById('problemSearchInput');
+      if (input) {
+        input.value = 'SIH1601';
+        handleSearch();
+      }
+      showToast('Filtering AICTE & MoE Ground-Truth Challenges', 'info');
+    });
+  }
+
+  if (chip2) {
+    chip2.addEventListener('click', () => {
+      switchView('stack');
+      showToast('Opening Tech-Stack Compatibility Matcher (96%)', 'info');
+    });
+  }
+
+  if (chip3) {
+    chip3.addEventListener('click', () => {
+      switchView('discovery');
+      showToast('Loading Prior-Art Prototype Deconstruction for SIH1601', 'info');
+    });
+  }
+
+  if (chip4) {
+    chip4.addEventListener('click', () => {
+      switchView('timeline');
+      showToast('Launching 36-Hour Hackathon Sprint Blueprint', 'info');
+    });
+  }
+}
+
+function onMacbookResize() {
+  const state = macbookSceneState;
+  const container = document.getElementById('macbookCanvasWrapper');
+  if (!state.renderer || !state.camera || !container) return;
+
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 460;
+
+  state.camera.aspect = width / height;
+
+  // Responsive camera framing for mobile vs desktop
+  if (width < 640) {
+    state.camera.fov = 48;
+    state.camera.position.set(0, 1.9, 7.4);
+  } else if (width < 900) {
+    state.camera.fov = 42;
+    state.camera.position.set(0, 1.85, 6.7);
+  } else {
+    state.camera.fov = 38;
+    state.camera.position.set(0, 1.8, 6.2);
+  }
+
+  state.camera.updateProjectionMatrix();
+  state.renderer.setSize(width, height);
+}
+
+// ----------------------------------------------------
+// MacBook Control Bar Actions (Exposed to HTML buttons)
+// ----------------------------------------------------
+function toggleMacbookLid() {
+  const state = macbookSceneState;
+  const statusDisplay = document.getElementById('macbookStatusDisplay');
+
+  if (state.isLidOpen) {
+    // Close Lid
+    state.targetLidAngle = 0.0;
+    state.isLidOpen = false;
+    if (statusDisplay) {
+      statusDisplay.innerHTML = 'MacBook Pro • <span style="color:#E0A96D;">Lid Closed • Low-Power Standby</span>';
+    }
+    showToast('MacBook lid closed into standby mode', 'info');
+  } else {
+    // Open Lid
+    state.targetLidAngle = 1.885;
+    state.isLidOpen = true;
+    if (statusDisplay) {
+      statusDisplay.innerHTML = 'MacBook Pro • <span style="color:#A3B19C;">Opening Angle: 108° • Display Active</span>';
+    }
+    showToast('MacBook lid opened to 108° presentation angle', 'info');
+  }
+}
+
+function resetMacbookView() {
+  const state = macbookSceneState;
+  state.targetRot.x = 0.22;
+  state.targetRot.y = -0.32;
+  state.targetParallax.x = 0;
+  state.targetParallax.y = 0;
+  state.targetLidAngle = 1.885;
+  state.isLidOpen = true;
+
+  const statusDisplay = document.getElementById('macbookStatusDisplay');
+  if (statusDisplay) {
+    statusDisplay.innerHTML = 'MacBook Pro • Opening Angle: 108° • Display Active';
+  }
+
+  showToast('3D Camera angle reset to default perspective', 'info');
+}
+
+function triggerMacbookTerminalDemo() {
+  const state = macbookSceneState;
+  if (state.auditMode) return;
+
+  state.auditMode = true;
+  state.auditLogs = [];
+
+  // Open lid if closed
+  if (!state.isLidOpen) {
+    state.targetLidAngle = 1.885;
+    state.isLidOpen = true;
+  }
+
+  showToast('⚡ Running Live Challenge Audit on SIH1601...', 'info');
+
+  const steps = [
+    { text: '[AUDIT STEP 1/4] Querying AICTE Ground-Truth Repository...', color: '#7EC8E3', delay: 400 },
+    { text: '[AUDIT STEP 2/4] Verifying Hardware BOM Ceiling: ₹4,250 (Approved)', color: '#A3B19C', delay: 1100 },
+    { text: '[AUDIT STEP 3/4] Running Prior-Art Conflict Forensics (14 repos clean)', color: '#DDD0C1', delay: 1800 },
+    { text: '[AUDIT STEP 4/4] 36-Hour Hackathon Feasibility Verified: 98.2% Win Probability', color: '#4ADE80', delay: 2500 }
+  ];
+
+  steps.forEach(step => {
+    setTimeout(() => {
+      state.auditLogs.push(step);
+    }, step.delay);
+  });
+
+  // Complete Audit and trigger celebration
+  setTimeout(() => {
+    state.auditMode = false;
+    triggerConfetti();
+    showToast('✓ Challenge Audit Completed! SIH1601 is 98.2% hackathon-ready.', 'info');
+
+    // Pulse highlight all spatial chips
+    document.querySelectorAll('.floating-spatial-chip').forEach(chip => {
+      chip.style.borderColor = '#A3B19C';
+      chip.style.boxShadow = '0 0 20px rgba(163, 177, 156, 0.4)';
+      setTimeout(() => {
+        chip.style.borderColor = '';
+        chip.style.boxShadow = '';
+      }, 3500);
+    });
+  }, 3600);
+}
+
+// Expose functions globally for HTML onclick handlers
+window.toggleMacbookLid = toggleMacbookLid;
+window.resetMacbookView = resetMacbookView;
+window.triggerMacbookTerminalDemo = triggerMacbookTerminalDemo;
+

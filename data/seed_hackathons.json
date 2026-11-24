@@ -15,7 +15,7 @@
     "badge": "National Flagship",
     "eligibility": "B.Tech, B.E., M.Tech, MCA, Polytechnic Regular Students",
     "team_size": "Mandatory 6 members (At least 1 female participant)",
-    "prize_pool": "₹1,00,000 per Problem Statement (Total ₹1.5+ Cr)",
+    "prize_pool": "\u20b91,00,000 per Problem Statement (Total \u20b91.5+ Cr)",
     "themes": [
       "Smart Agriculture",
       "Clean & Green Technology",
@@ -36,7 +36,16 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Official Portal (sih.gov.in)",
     "description": "India's largest nationwide student hackathon organized by AICTE and the Ministry of Education for solving ministry and industry problem statements.",
-    "matched_problem_ids": ["sih-1601", "sih-1645", "sih-1710", "sih-1722", "sih-1804", "sih-1850", "sih-1912", "sih-1930"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1645",
+      "sih-1710",
+      "sih-1722",
+      "sih-1804",
+      "sih-1850",
+      "sih-1912",
+      "sih-1930"
+    ]
   },
   {
     "id": "hack-unstop-hub-2026",
@@ -54,7 +63,7 @@
     "badge": "Active Hub (100+ Hackathons)",
     "eligibility": "All Engineering & College Students across India",
     "team_size": "1 to 5 members",
-    "prize_pool": "₹50,000 to ₹10,00,000 per Hackathon + PPIs",
+    "prize_pool": "\u20b950,000 to \u20b910,00,000 per Hackathon + PPIs",
     "themes": [
       "AI & Machine Learning",
       "Fullstack Web & Mobile Development",
@@ -73,7 +82,16 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Live Directory (unstop.com)",
     "description": "India's primary live directory where colleges across Tamil Nadu, Karnataka, and Pan-India host active technical student hackathons.",
-    "matched_problem_ids": ["sih-1601", "sih-1645", "sih-1710", "sih-1722", "sih-1804", "sih-1850", "sih-1912", "sih-1930"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1645",
+      "sih-1710",
+      "sih-1722",
+      "sih-1804",
+      "sih-1850",
+      "sih-1912",
+      "sih-1930"
+    ]
   },
   {
     "id": "hack-flipkart-grid-2026",
@@ -91,7 +109,7 @@
     "badge": "Corporate SDE Hackathon",
     "eligibility": "B.Tech, B.E., M.Tech, and Engineering Undergraduates",
     "team_size": "2 to 3 members",
-    "prize_pool": "₹5,25,000 + Pre-Placement Interviews (PPIs for SDE-1)",
+    "prize_pool": "\u20b95,25,000 + Pre-Placement Interviews (PPIs for SDE-1)",
     "themes": [
       "Software Development & Microservices",
       "Information Security & Privacy",
@@ -108,7 +126,11 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Campus Hackathon (unstop.com)",
     "description": "India's premier corporate engineering hackathon for college students, providing direct SDE-1 job and internship interviews at Flipkart.",
-    "matched_problem_ids": ["sih-1645", "sih-1710", "sih-1930"]
+    "matched_problem_ids": [
+      "sih-1645",
+      "sih-1710",
+      "sih-1930"
+    ]
   },
   {
     "id": "hack-tnsic-2026",
@@ -126,7 +148,7 @@
     "badge": "State Government Flagship",
     "eligibility": "Students enrolled in any recognized college/university in Tamil Nadu",
     "team_size": "2 to 4 members",
-    "prize_pool": "₹10,00,000 in Grants + Incubation Fellowship",
+    "prize_pool": "\u20b910,00,000 in Grants + Incubation Fellowship",
     "themes": [
       "AgriTech Innovations for Tamil Nadu",
       "Smart Mobility & Road Safety",
@@ -144,7 +166,12 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Official Portal (editn.in)",
     "description": "Tamil Nadu government's flagship student innovation challenge rewarding viable prototypes solving state-specific agricultural and infrastructural challenges.",
-    "matched_problem_ids": ["sih-1601", "sih-1645", "sih-1804", "sih-1850"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1645",
+      "sih-1804",
+      "sih-1850"
+    ]
   },
   {
     "id": "hack-devpost-global-2026",
@@ -180,7 +207,14 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Hackathon Platform (devpost.com)",
     "description": "The world's largest platform for software and student hackathons with live competition tracks and cash prizes.",
-    "matched_problem_ids": ["sih-1601", "sih-1710", "sih-1804", "sih-1850", "sih-1912", "sih-1930"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1710",
+      "sih-1804",
+      "sih-1850",
+      "sih-1912",
+      "sih-1930"
+    ]
   },
   {
     "id": "hack-mlh-season-2026",
@@ -215,7 +249,12 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Student League (mlh.io)",
     "description": "The official global community for student hackathons, organizing 200+ weekend student hackathons annually worldwide.",
-    "matched_problem_ids": ["sih-1601", "sih-1645", "sih-1722", "sih-1912"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1645",
+      "sih-1722",
+      "sih-1912"
+    ]
   },
   {
     "id": "hack-shaastra-2027",
@@ -233,7 +272,7 @@
     "badge": "Premier Technical Festival",
     "eligibility": "All college and polytechnic students across India",
     "team_size": "3 to 4 members",
-    "prize_pool": "₹3,00,000 + Internship Interviews",
+    "prize_pool": "\u20b93,00,000 + Internship Interviews",
     "themes": [
       "Autonomous Systems & AI",
       "Healthcare Diagnostics",
@@ -251,7 +290,12 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Official Festival Portal (shaastra.org)",
     "description": "One of India's premier ISO-certified student engineering hackathons featuring challenging problem statements and technical benchmarks.",
-    "matched_problem_ids": ["sih-1645", "sih-1722", "sih-1930", "sih-1850"]
+    "matched_problem_ids": [
+      "sih-1645",
+      "sih-1722",
+      "sih-1930",
+      "sih-1850"
+    ]
   },
   {
     "id": "hack-google-solution-2027",
@@ -286,6 +330,128 @@
     "checked_date": "2026-11-23",
     "verification_status": "Verified Global Portal",
     "description": "Annual international competition inviting university students to use Google technologies to solve one or more of the United Nations 17 Sustainable Development Goals.",
-    "matched_problem_ids": ["sih-1601", "sih-1710", "sih-1804", "sih-1850", "sih-1912"]
+    "matched_problem_ids": [
+      "sih-1601",
+      "sih-1710",
+      "sih-1804",
+      "sih-1850",
+      "sih-1912"
+    ]
+  },
+  {
+    "id": "hack-shaastra-neurohack",
+    "name": "Shaastra NeuroHack \u2014 Brain-Computer Interface Challenge",
+    "organizer": "IIT Madras Shaastra & Centre for Brain Research",
+    "location": "IIT Madras (Biotech Dept & IC&SR), Chennai, Tamil Nadu",
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "region": "Tamil Nadu",
+    "format": "Hybrid",
+    "dates": "Jan 03 - 05, 2027",
+    "registration_deadline": "2026-12-24T23:59:59+05:30",
+    "status": "Upcoming",
+    "badge": "Flagship AI Hackathon",
+    "eligibility": "Engineering students, biomedical researchers, AI/ML developers",
+    "team_size": "2 to 4 members",
+    "prize_pool": "\u20b92,50,000 + IITM Incubation Fast-Track",
+    "themes": [
+      "EEG Neural Decoding",
+      "Assistive Robotics",
+      "TinyML on Edge BCI Hardware",
+      "Real-time Biosignal Classification"
+    ],
+    "judging_criteria": [
+      "Signal Processing & Artifact Filtration (30%)",
+      "Classification Accuracy & Latency Benchmarks (35%)",
+      "Patient Assistive Usability & Ergonomics (20%)",
+      "Hardware BOM & Open-Source Rigor (15%)"
+    ],
+    "official_url": "https://shaastra.org",
+    "fallback_url": "https://www.iitm.ac.in",
+    "checked_date": "2026-11-23",
+    "verification_status": "Verified Official Portal (shaastra.org)",
+    "description": "India\u2019s premier collegiate Neurotechnology hackathon challenging teams to translate raw EEG brainwaves into functional assistive robotics and communication software.",
+    "matched_problem_ids": [
+      "shaastra-2501"
+    ]
+  },
+  {
+    "id": "hack-shaastra-autonomy",
+    "name": "Caterpillar Autonomy Challenge @ Shaastra IIT Madras",
+    "organizer": "Caterpillar Inc. & Shaastra Centre for Innovation (CFI)",
+    "location": "IIT Madras (Robotics Arena & IC&SR), Chennai, Tamil Nadu",
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "region": "Tamil Nadu",
+    "format": "In-person",
+    "dates": "Jan 04 - 06, 2027",
+    "registration_deadline": "2026-12-22T23:59:59+05:30",
+    "status": "Upcoming",
+    "badge": "Industry Flagship Challenge",
+    "eligibility": "B.Tech / M.Tech students in Robotics, CS, ECE, Mechatronics",
+    "team_size": "3 to 5 members",
+    "prize_pool": "\u20b93,00,000 + Caterpillar R&D PPIs",
+    "themes": [
+      "LiDAR SLAM & Odometry",
+      "ROS 2 Autonomous Navigation",
+      "Obstacle Avoidance in Heavy Industry",
+      "Edge Compute Optimization"
+    ],
+    "judging_criteria": [
+      "Centimeter-Level Localization Accuracy (35%)",
+      "Real-time Dynamic Collision Avoidance (30%)",
+      "ROS 2 Architecture & Node Efficiency (20%)",
+      "Physical Arena Demonstration (15%)"
+    ],
+    "official_url": "https://shaastra.org",
+    "fallback_url": "https://www.iitm.ac.in",
+    "checked_date": "2026-11-23",
+    "verification_status": "Verified Official Portal (shaastra.org)",
+    "description": "Challenging student roboticists to build industrial-grade autonomous ground vehicles navigating simulated and physical obstacle courses.",
+    "matched_problem_ids": [
+      "shaastra-2502"
+    ]
+  },
+  {
+    "id": "hack-shaastra-futurecities",
+    "name": "Shaastra Future Cities & Smart Infrastructure Hackathon",
+    "organizer": "IIT Madras & Ministry of Housing and Urban Affairs",
+    "location": "Student Activity Centre (SAC), IIT Madras, Chennai",
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "country": "India",
+    "region": "Tamil Nadu",
+    "format": "Hybrid",
+    "dates": "Jan 03 - 05, 2027",
+    "registration_deadline": "2026-12-25T23:59:59+05:30",
+    "status": "Upcoming",
+    "badge": "Civic Tech & IoT Flagship",
+    "eligibility": "Undergraduate and postgraduate students across all disciplines",
+    "team_size": "3 to 4 members",
+    "prize_pool": "\u20b93,50,000 + Pilot Implementation Grant",
+    "themes": [
+      "Smart Water Distribution & Leak AI",
+      "Urban Microgrid Energy Orchestration",
+      "Autonomous Traffic Flow Optimization",
+      "Resilient Municipal Waste Telemetry"
+    ],
+    "judging_criteria": [
+      "Field Feasibility & Municipal Scalability (35%)",
+      "End-to-End IoT & Edge AI Working Prototype (30%)",
+      "Cost-Effectiveness & Deployment Readiness (20%)",
+      "Civic Impact & User Accessibility (15%)"
+    ],
+    "official_url": "https://shaastra.org",
+    "fallback_url": "https://www.iitm.ac.in",
+    "checked_date": "2026-11-23",
+    "verification_status": "Verified Official Portal (shaastra.org)",
+    "description": "Build high-impact civic technology and smart municipal infrastructure solutions for Chennai and metropolitan India.",
+    "matched_problem_ids": [
+      "shaastra-2503",
+      "sih-1850",
+      "sih-1804"
+    ]
   }
 ]

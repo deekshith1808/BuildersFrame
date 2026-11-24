@@ -125,6 +125,83 @@
             <span class="home-chip" onclick="quickSearchHome('Deepfake Voice SIH1930')">🛡️ Deepfake Audio (SIH1930)</span>
           </div>
 
+          <!-- Interactive 3D MacBook Opening Scene & Showcase -->
+          <div class="macbook-3d-showcase" id="macbook3DShowcase">
+            <div class="macbook-stage-header">
+              <div class="stage-tag-badge">
+                <span class="live-pulse-dot"></span>
+                <span>INTERACTIVE 3D INTRO • BUILDERSFRAME OS</span>
+              </div>
+              <div class="stage-cue-text">
+                <span>🖱️ Click & Drag to Rotate in 3D • Lid Auto-Opens</span>
+              </div>
+            </div>
+
+            <div class="macbook-canvas-wrapper" id="macbookCanvasWrapper">
+              <canvas id="macbook3DCanvas" class="macbook-3d-canvas"></canvas>
+
+              <!-- 3D Floating Spatial Holographic Chips -->
+              <div class="floating-spatial-chip chip-pos-tl" id="spatialChip1">
+                <div class="chip-inner">
+                  <span class="chip-symbol">🛡️</span>
+                  <div class="chip-text">
+                    <span class="chip-title">Ground-Truth Verified</span>
+                    <span class="chip-meta">AICTE & MoE Problem Library</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="floating-spatial-chip chip-pos-tr" id="spatialChip2">
+                <div class="chip-inner">
+                  <span class="chip-symbol">🧠</span>
+                  <div class="chip-text">
+                    <span class="chip-title">96% Tech-Stack Match</span>
+                    <span class="chip-meta">Collegiate Engineering Teams</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="floating-spatial-chip chip-pos-bl" id="spatialChip3">
+                <div class="chip-inner">
+                  <span class="chip-symbol">📜</span>
+                  <div class="chip-text">
+                    <span class="chip-title">Prior-Art Forensic Audit</span>
+                    <span class="chip-meta">14 Prototypes Deconstructed</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="floating-spatial-chip chip-pos-br" id="spatialChip4">
+                <div class="chip-inner">
+                  <span class="chip-symbol">⚡</span>
+                  <div class="chip-text">
+                    <span class="chip-title">36h Sprint Feasibility</span>
+                    <span class="chip-meta">Verified BOM & Offline Stacks</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MacBook Interactive Control Bar -->
+            <div class="macbook-control-bar">
+              <div class="macbook-info-pill">
+                <span class="pill-dot"></span>
+                <span id="macbookStatusDisplay">MacBook Pro • Opening Angle: 108° • Display Active</span>
+              </div>
+              <div class="macbook-action-btns">
+                <button type="button" class="btn btn-soft btn-sm" onclick="toggleMacbookLid()" title="Open or close laptop lid">
+                  <span>💻 Toggle Lid</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="resetMacbookView()" title="Reset 3D camera angle">
+                  <span>🔄 Reset Angle</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="triggerMacbookTerminalDemo()" title="Run live verification simulation">
+                  <span>▶️ Run Challenge Audit</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Interactive Quick Match Finder Widget -->
           <div class="home-interactive-finder motion-spotlight-card">
             <div class="finder-header-row">
@@ -1087,7 +1164,10 @@
   <!-- Celebratory Confetti Canvas -->
   <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
 
-  <!-- Application Logic -->
+  <!-- Three.js 3D Engine (Self-contained, local) -->
+  <script src="/three.min.js"></script>
+
+  <!-- Application Logic & 3D MacBook Engine -->
   <script src="/app.js"></script>
 </body>
 </html>
