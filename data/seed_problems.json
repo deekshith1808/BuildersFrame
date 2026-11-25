@@ -9,7 +9,7 @@
     "affected_group": "Smallholder farmers in drought-prone and delta districts with limited agronomist access",
     "summary": "Build a lightweight edge-compatible mobile/IoT scanning solution that identifies pest egg clusters and leaf blights at early onset and provides targeted, regional-language organic/chemical pesticide dosage advice.",
     "context": "Fall Armyworm and Pink Bollworm cause over 30% yield loss in cotton and maize before visible damage prompts spraying. Farmers currently over-spray blanket broad-spectrum pesticides, causing soil degradation and financial distress.",
-    "constraints": "Must work fully offline with on-device quantized model inference (TFLite/ONNX). Sensor/attachment BOM must remain under \u20b9800. Must support Tamil, Hindi, Telugu, and Marathi audio prompts.",
+    "constraints": "Must work fully offline with on-device quantized model inference (TFLite/ONNX). Sensor/attachment BOM must remain under ₹800. Must support Tamil, Hindi, Telugu, and Marathi audio prompts.",
     "required_skills": [
       "Python",
       "TensorFlow/PyTorch",
@@ -24,8 +24,8 @@
     "sources": [
       {
         "name": "Smart India Hackathon 2024 Portal (PS ID: 1601)",
-        "url": "https://sih.gov.in/sih2024PS",
-        "checked_date": "2026-10-18"
+        "url": "https://sih.gov.in",
+        "checked_date": "2026-11-25"
       },
       {
         "name": "ICAR Annual Research Report on Crop Protection",
@@ -38,18 +38,16 @@
     "hints": "Judges look for offline inference speed and realistic dosage recommendations based on acreage, rather than generic bounding-box detection. Highlight regional voice feedback for semi-literate farmers.",
     "previous_prototypes": [
       {
-        "team_name": "AgriVision (SIH 2023 Runner-Up)",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2023",
         "prototype_summary": "Built a basic ResNet50 classifier deployed on a cloud server with Streamlit UI.",
-        "shortcoming": "Failed in real farm tests due to 4G connectivity dropouts in rural fields and lacked actionable remediation dosages.",
-        "repo_url": "https://github.com/example/agrivision-sih23-prototype"
+        "shortcoming": "Failed in real farm tests due to 4G connectivity dropouts in rural fields and lacked actionable remediation dosages."
       },
       {
-        "team_name": "CropLens",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "Raspberry Pi 4 with camera mounted on a stick with local web interface.",
-        "shortcoming": "Hardware BOM cost exceeded \u20b96,500, making it unaffordable for individual smallholders; high battery consumption (2.5 hours runtime).",
-        "repo_url": "https://github.com/example/croplens-hardware-v1"
+        "shortcoming": "Hardware BOM cost exceeded ₹6,500, making it unaffordable for individual smallholders; high battery consumption (2.5 hours runtime)."
       }
     ],
     "sample_solution_direction": "Use a 3D-printed $2 macro optical clip for standard smartphones + quantized MobileNet-EdgeTPU model running in Flutter with local SQLite dosage lookup matrix."
@@ -93,11 +91,10 @@
     "hints": "Key differentiator is the sensor fusion: coupling IMU z-axis acceleration spikes with optical optical-flow bounding boxes. Pure vision fails in night or waterlogged potholes.",
     "previous_prototypes": [
       {
-        "team_name": "RoadGuardians",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2023",
         "prototype_summary": "YOLOv5 trained on open dataset running on laptop recording webcam.",
-        "shortcoming": "Could not calculate depth or repair volume. Suffered false positives from shadows and lane markings.",
-        "repo_url": "https://github.com/example/roadguardians-pothole"
+        "shortcoming": "Could not calculate depth or repair volume. Suffered false positives from shadows and lane markings."
       }
     ],
     "sample_solution_direction": "Dual-stream Kalman filter fusing accelerometer z-variance with YOLOv8-nano optical bbox to compute rough polygon area and volumetric asphalt ton required."
@@ -110,9 +107,9 @@
     "domain": "Healthcare & Biomedical",
     "category": "Both",
     "affected_group": "Rural Primary Health Centres (PHCs), ASHA workers, and child immunization recipients",
-    "summary": "A tamper-evident, low-cost BLE temperature data logger coupled with a cryptographic ledger verifying that temperature-sensitive vaccines remained between 2\u00b0C and 8\u00b0C throughout transit from district depots to village camps.",
+    "summary": "A tamper-evident, low-cost BLE temperature data logger coupled with a cryptographic ledger verifying that temperature-sensitive vaccines remained between 2°C and 8°C throughout transit from district depots to village camps.",
     "context": "Up to 25% of vaccines in tropical states lose potency during the last-mile ice-box transit due to melted coolant packs, with no automated log proving whether the cold chain was maintained.",
-    "constraints": "Total tag cost must be under \u20b9350 ($4). Battery must survive 45 days. Must synchronize with ASHA worker's ANM-OL smartphone app via offline BLE beacon broadcasts.",
+    "constraints": "Total tag cost must be under ₹350 ($4). Battery must survive 45 days. Must synchronize with ASHA worker's ANM-OL smartphone app via offline BLE beacon broadcasts.",
     "required_skills": [
       "BLE / Nordic nRF / ESP32",
       "Web3 / Cryptography",
@@ -140,11 +137,10 @@
     "hints": "Do not build a slow public Ethereum blockchain. Use lightweight cryptographic hash chains (Merkle trees) stamped to a verifiable state channel or Hyperledger Besu instance.",
     "previous_prototypes": [
       {
-        "team_name": "ColdProof (SIH 2022 Finalist)",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2022",
         "prototype_summary": "Arduino Uno with GSM SIM800 module transmitting temperature via HTTP every 5 minutes.",
-        "shortcoming": "Device consumed too much power (died in 4 hours), required expensive SIM cards in each vial box, and was too bulky for vaccine carriers.",
-        "repo_url": "https://github.com/example/coldproof-arduino"
+        "shortcoming": "Device consumed too much power (died in 4 hours), required expensive SIM cards in each vial box, and was too bulky for vaccine carriers."
       }
     ],
     "sample_solution_direction": "Use ultra-low power nRF52840 broadcasting encrypted periodic beacon advertisements, logged by receiving smartphones without active pairing."
@@ -183,11 +179,10 @@
     "hints": "Judges reward end-to-end flow: deaf patient gestures -> live text & voice synthesis -> doctor answers -> animated avatar signs back -> medical triage card generated.",
     "previous_prototypes": [
       {
-        "team_name": "SignEase",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2023",
         "prototype_summary": "Static image classification of single hand alphabets A-Z using CNN.",
-        "shortcoming": "Real ISL uses dynamic motion gestures and two hands, not isolated finger-spelling. Alphabet spelling is unusable during heart attack or trauma.",
-        "repo_url": "https://github.com/example/signease-static"
+        "shortcoming": "Real ISL uses dynamic motion gestures and two hands, not isolated finger-spelling. Alphabet spelling is unusable during heart attack or trauma."
       }
     ],
     "sample_solution_direction": "MediaPipe holistic tracking + temporal GRU or light Transformer on normalized landmark coordinate streams."
@@ -226,11 +221,10 @@
     "hints": "Simulate a live dashboard showing 3 campuses and 2 cold storage units with automated load dispatching whenever battery charges above 85%.",
     "previous_prototypes": [
       {
-        "team_name": "SolShare",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2023",
         "prototype_summary": "Basic web dashboard displaying simulated meter readings.",
-        "shortcoming": "Had zero predictive intelligence. Only showed historical graphs without automated dispatch decisions.",
-        "repo_url": "https://github.com/example/solshare-dashboard"
+        "shortcoming": "Had zero predictive intelligence. Only showed historical graphs without automated dispatch decisions."
       }
     ],
     "sample_solution_direction": "FastAPI backend with LightGBM hourly solar irradiation forecaster + rule engine assigning surplus electricity via priority queue to agro-coolers."
@@ -245,7 +239,7 @@
     "affected_group": "Rural village water supply committees and municipal pipe network maintenance staff",
     "summary": "Non-invasive acoustic clamp-on sensor unit that analyzes pipe frequency harmonics to detect pinhole leaks, non-revenue water loss, and backflow contamination in drinking water lines.",
     "context": "Over 35% of treated drinking water distributed under the Jal Jeevan Mission is lost in underground distribution pipelines before reaching tap connections, while cracked pipes suck in septic runoff during pressure drops.",
-    "constraints": "Sensor node must be non-intrusive (no cutting pipes). Cost under \u20b91,200 per node. LoRaWAN transmission for 5km rural range without GSM dependency.",
+    "constraints": "Sensor node must be non-intrusive (no cutting pipes). Cost under ₹1,200 per node. LoRaWAN transmission for 5km rural range without GSM dependency.",
     "required_skills": [
       "Signal Processing",
       "ESP32 / LoRa",
@@ -269,11 +263,10 @@
     "hints": "Highlight how acoustic wave propagation velocity identifies the exact leak position (within 2 meters) along a 50m pipe segment using cross-correlation between two nodes.",
     "previous_prototypes": [
       {
-        "team_name": "AquaSense",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "Ultrasonic flow meter installed inside the pipe line.",
-        "shortcoming": "Required municipal plumbers to cut active pipe sections, risking contamination and voiding pipe manufacturer warranties.",
-        "repo_url": "https://github.com/example/aquasense-flow"
+        "shortcoming": "Required municipal plumbers to cut active pipe sections, risking contamination and voiding pipe manufacturer warranties."
       }
     ],
     "sample_solution_direction": "Clamp-on piezoelectric contact microphone + ESP32 calculating Fast Fourier Transform (FFT) peak shift, transmitting anomalies over LoRaWAN."
@@ -312,11 +305,10 @@
     "hints": "Demonstrate the peer-to-peer local sync: when one teacher's phone enters a cellular zone once a week, it uploads the aggregated progress batch.",
     "previous_prototypes": [
       {
-        "team_name": "EduBridge",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2023",
         "prototype_summary": "React Native app with video lectures.",
-        "shortcoming": "App weighed 450MB and required streaming videos from AWS S3, instantly crashing when internet dropped.",
-        "repo_url": "https://github.com/example/edubridge-app"
+        "shortcoming": "App weighed 450MB and required streaming videos from AWS S3, instantly crashing when internet dropped."
       }
     ],
     "sample_solution_direction": "Progressive Web App built with Tailwind and lightweight Canvas animations, storing game states in RxDB/IndexedDB and syncing via Wi-Fi hotspot sync."
@@ -330,7 +322,7 @@
     "category": "Software",
     "affected_group": "Elderly citizens, bank customers, and emergency financial contact respondents",
     "summary": "Real-time acoustic spectral analysis model running on mobile or PBX gateways that detects synthetic AI voice clones (ElevenLabs/VALL-E) and warns users during incoming fraud calls.",
-    "context": "Scammers are calling parents with voice clones of their children pleading for urgent bail or hospital money. Over \u20b91,200 Crores was lost in digital arrest and spoofed voice scams in 2024-2025.",
+    "context": "Scammers are calling parents with voice clones of their children pleading for urgent bail or hospital money. Over ₹1,200 Crores was lost in digital arrest and spoofed voice scams in 2024-2025.",
     "constraints": "Inference within 2.5 seconds of phone call audio snippet. Must analyze phase continuity and breathing artifacts without access to original reference voices.",
     "required_skills": [
       "Python",
@@ -355,11 +347,10 @@
     "hints": "Judges want to see visual proof of detection: spectrogram comparisons showing unnatural spectral cutoffs and lack of biological glottal pulse jitter in synthetic speech.",
     "previous_prototypes": [
       {
-        "team_name": "FakeGuard",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "Cloud API checking audio files uploaded via a web form.",
-        "shortcoming": "Latency was 14 seconds\u2014unusable during an ongoing active phone scam call.",
-        "repo_url": "https://github.com/example/fakeguard-audio"
+        "shortcoming": "Latency was 14 seconds—unusable during an ongoing active phone scam call."
       }
     ],
     "sample_solution_direction": "Biquad filter + Mel-Frequency Cepstral Coefficients (MFCC) feature extraction fed to a quantized MobileNetV3 1D-spectrogram classifier."
@@ -403,11 +394,10 @@
     "hints": "Judges prioritize artifact suppression algorithms (ICA/CSP) and transfer learning across subjects over complex transformer models with excessive compute overhead.",
     "previous_prototypes": [
       {
-        "team_name": "CortexComm (Shaastra 2024 Finalist)",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "EEG classifier using 1D-CNN hosted on cloud Flask server.",
-        "shortcoming": "Cloud latency reached 850ms making typing frustrating; lacked subject-adaptation.",
-        "repo_url": "https://github.com/example/cortexcomm-bci-prototype"
+        "shortcoming": "Cloud latency reached 850ms making typing frustrating; lacked subject-adaptation."
       }
     ],
     "sample_solution_direction": "Combine Common Spatial Patterns (CSP) spatial filtering with a lightweight EEGNet architecture running quantized ONNX on local device."
@@ -451,11 +441,10 @@
     "hints": "Focus on graceful degradation during degenerate geometries (long narrow featureless corridors). Implement adaptive costmaps.",
     "previous_prototypes": [
       {
-        "team_name": "RoboNav (Caterpillar Challenge 2024)",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "Cartographer 2D SLAM running on Raspberry Pi 4.",
-        "shortcoming": "Lost tracking completely when turning corners around stacked pallets; high computational lag.",
-        "repo_url": "https://github.com/example/robonav-caterpillar-slam"
+        "shortcoming": "Lost tracking completely when turning corners around stacked pallets; high computational lag."
       }
     ],
     "sample_solution_direction": "Implement an iterated error-state Kalman filter (FAST-LIO2) with OctoMap dynamic voxel filtering and Nav2 trajectory controllers in ROS 2."
@@ -470,7 +459,7 @@
     "affected_group": "Metro water authorities, urban residents facing non-revenue water loss (NRW)",
     "summary": "Deploy low-cost hydrophone acoustic edge nodes to detect underground micro-bursts and cavitation anomalies in distribution lines before sinkhole formation occurs.",
     "context": "Indian metropolitan cities lose between 35% to 45% of treated drinking water to hidden underground leaks. Current manual acoustic correlators are labor-intensive and only deployed after major surfacing leaks.",
-    "constraints": "Node BOM must remain under \u20b91,200. Battery life minimum 18 months via solar trickle. Wireless telemetry via LoRaWAN up to 3km radius.",
+    "constraints": "Node BOM must remain under ₹1,200. Battery life minimum 18 months via solar trickle. Wireless telemetry via LoRaWAN up to 3km radius.",
     "required_skills": [
       "Python",
       "Digital Signal Processing (DSP)",
@@ -499,13 +488,601 @@
     "hints": "Focus on cross-correlation delay estimation between two adjacent pipe nodes to pinpoint leak coordinates to within 1.5 meters.",
     "previous_prototypes": [
       {
-        "team_name": "AquaSense (TNSI 2024)",
+        "team_name": "Typical Student Prototype Pitfall",
         "year": "2024",
         "prototype_summary": "GSM-based pressure sensor logging to Google Sheets.",
-        "shortcoming": "GSM module drained 12V lead-acid battery within 3 weeks; pressure thresholding generated 60% false alarms during normal valve cycling.",
-        "repo_url": "https://github.com/example/aquasense-gsm-leak"
+        "shortcoming": "GSM module drained 12V lead-acid battery within 3 weeks; pressure thresholding generated 60% false alarms during normal valve cycling."
       }
     ],
     "sample_solution_direction": "Piezoelectric contact microphone + TinyML 1D convolutional spectrogram classifier on ESP32-S3 reporting anomalous energy bands via LoRaWAN."
+  },
+  {
+    "id": "bf-301",
+    "code": "BF301",
+    "title": "Mandi Price Volatility & Local Cold-Storage Spoilage Alert App for Smallholder Farmers",
+    "organization": "Curated Agri-Tech Track (BuildersFrame)",
+    "domain": "Smart Agriculture",
+    "category": "Software",
+    "affected_group": "Small and marginal vegetable growers deciding harvest timing and nearby mandi dispatch",
+    "summary": "Combine historical Agmarknet mandi price trends with 7-day weather forecasts and shelf-life decay rules to recommend whether farmers should sell immediately, hold in ventilated storage, or pool transport.",
+    "context": "Perishable crops like tomato, onion, and okra frequently suffer 20–30% distress price drops during local harvest gluts while nearby district mandis show shortages within the same week.",
+    "constraints": "Must work on low-bandwidth Android browsers in regional languages (Tamil, Hindi, Telugu) and rely only on verifiable public price feeds plus simple farmer stock inputs.",
+    "required_skills": [
+      "Python",
+      "Time Series Forecasting",
+      "FastAPI",
+      "React",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 8.6,
+    "feasibility_notes": "Agmarknet historical commodity price CSVs and Open-Meteo weather APIs are free to query. A clean 36-hour MVP can forecast 7-day spread across 5 nearby mandis with SMS/WhatsApp summary export.",
+    "sources": [
+      {
+        "name": "Agmarknet Agricultural Marketing Data Portal",
+        "url": "https://agmarknet.gov.in",
+        "checked_date": "2026-11-25"
+      },
+      {
+        "name": "Open Government Data Platform India (Commodity Prices)",
+        "url": "https://data.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Compare net price after transport cost per kilometer rather than showing raw mandi rates, otherwise farmers pick distant markets that lose money on freight.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Static table displaying yesterday's mandi prices across India.",
+        "shortcoming": "Ignored transport fuel cost, spoilage window, and local market arrival volume."
+      }
+    ],
+    "sample_solution_direction": "FastAPI service ingesting Agmarknet historical CSVs + Prophet/XGBoost short-horizon forecast + mobile-first React net-profit calculator with freight deduction."
+  },
+  {
+    "id": "bf-302",
+    "code": "BF302",
+    "title": "Soil Moisture & Root-Zone Salinity Telemetry for Precision Drip Irrigation Scheduling",
+    "organization": "Curated Agri-IoT Track (BuildersFrame)",
+    "domain": "Smart Agriculture",
+    "category": "Both",
+    "affected_group": "Semi-arid drip-irrigation farmers managing borewell depletion and soil salinization",
+    "summary": "Build an affordable multi-depth capacitive soil moisture and EC salinity node that computes crop evapotranspiration deficits and prevents over-watering or fertilizer burn.",
+    "context": "Fixed timer-based drip schedules waste 25–40% groundwater during cloudy or cool weeks while uneven fertigation causes root-zone salt buildup in cotton, banana, and turmeric belts.",
+    "constraints": "Keep field node electronics under ₹1,500 using sealed capacitive probes (no bare resistive forks that corrode) and sleep current below 50 uA.",
+    "required_skills": [
+      "Embedded C/ESP32",
+      "IoT / Sensors",
+      "Python",
+      "FastAPI",
+      "Flutter"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.7,
+    "feasibility_notes": "Demonstrable on a tabletop planter box with two capacitive moisture probes, an EC module, solenoid relay simulation, and a Flutter irrigation schedule timeline.",
+    "sources": [
+      {
+        "name": "FAO Irrigation & Drainage Paper 56 (Evapotranspiration Guidelines)",
+        "url": "https://www.fao.org",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Include soil-type calibration curves (sandy loam vs clay) and temperature compensation for EC readings; raw ADC voltages vary wildly across soil textures.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Single FC-28 resistive sensor wired to Arduino turning a pump on below a hardcoded value.",
+        "shortcoming": "Resistive probes corroded within weeks and no hysteresis or rain forecast check prevented pointless watering right before rainfall."
+      }
+    ],
+    "sample_solution_direction": "ESP32 deep-sleep node with conformal-coated capacitive moisture probes + Penman-Monteith schedule adjustment served over FastAPI + Flutter valve override app."
+  },
+  {
+    "id": "bf-303",
+    "code": "BF303",
+    "title": "Accessible Last-Mile Transit & Wheelchair-Friendly Route Companion for Tier-2 Cities",
+    "organization": "Curated Civic Mobility Track (BuildersFrame)",
+    "domain": "Smart Mobility & Transport",
+    "category": "Software",
+    "affected_group": "Wheelchair users, elderly commuters, and visually impaired riders navigating city bus stops",
+    "summary": "Create a crowdsourced accessibility layer over OpenStreetMap transit stops tracking curb ramps, tactile paving, step-free bus boarding, and audible stop announcements.",
+    "context": "Standard map apps optimize purely for shortest driving or walking time, frequently routing wheelchair or crutch users onto broken footpaths, foot-overbridges with broken lifts, or uncurbed crossings.",
+    "constraints": "Must provide screen-reader friendly controls (WCAG AA contrast, TalkBack/VoiceOver labels) and allow 2-tap community verification of ramp or elevator status.",
+    "required_skills": [
+      "React Native",
+      "PostGIS / GIS",
+      "Node.js",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Beginner",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.5,
+    "feasibility_notes": "OpenStreetMap Overpass API + OpenRouteService custom wheelchair profile make an immediate working prototype for any campus or city ward.",
+    "sources": [
+      {
+        "name": "Accessible India Campaign (Sugamya Bharat Abhiyan) Guidelines",
+        "url": "https://depwd.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Focus on confidence scoring: an elevator marked working 6 months ago should decay in trust until another rider confirms it.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Static pin map showing hospital locations without pedestrian path penalties.",
+        "shortcoming": "Did not modify pedestrian graph edge weights, so turn-by-turn routes still sent users across inaccessible stairs."
+      }
+    ],
+    "sample_solution_direction": "PostGIS pgRouting network weighted by OSM curb/incline tags + React Native VoiceOver-tested transit companion with freshness decay on ramp reports."
+  },
+  {
+    "id": "bf-304",
+    "code": "BF304",
+    "title": "EV Two-Wheeler Battery Swap Demand & Feeder Grid Load Balancing Scheduler",
+    "organization": "Curated Clean Mobility Track (BuildersFrame)",
+    "domain": "Smart Mobility & Transport",
+    "category": "Software",
+    "affected_group": "Gig-economy delivery riders, swap-station operators, and urban distribution utilities",
+    "summary": "Predict hourly battery swap demand across city delivery hotspots and schedule smart off-peak charging at cabinets to reduce queue wait times and transformer peak load.",
+    "context": "Food and parcel delivery riders face 20–40 minute queues during evening rush when cabinets run out of fully charged packs, while charging all depleted packs simultaneously stresses local feeders.",
+    "constraints": "Charging plan must respect battery thermal recovery cooldown (15 minutes post-swap) and time-of-day tariff windows without leaving peak slots under-stocked.",
+    "required_skills": [
+      "Python",
+      "Time Series Forecasting",
+      "FastAPI",
+      "React",
+      "PostGIS / GIS"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.6,
+    "feasibility_notes": "Simulate city zones using OpenStreetMap delivery hubs and synthetic rider arrival curves; show interactive queue wait reduction vs naive charge-on-plug-in.",
+    "sources": [
+      {
+        "name": "NITI Aayog Battery Swapping Policy Draft Notes",
+        "url": "https://www.niti.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Present a clear before-vs-after metric: peak feeder kW drawdown and median rider wait minutes across simulated rush hours.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Map showing static charging station addresses with hardcoded availability.",
+        "shortcoming": "Had no demand forecast or charging-slot optimization logic."
+      }
+    ],
+    "sample_solution_direction": "Linear/MILP charger slot scheduler in Python SciPy + demand heatmap UI in React showing cabinet SoC readiness over 24 hours."
+  },
+  {
+    "id": "bf-305",
+    "code": "BF305",
+    "title": "Offline-First Antenatal & Immunization Follow-Up Assistant for Community Health Workers",
+    "organization": "Curated Public Health Track (BuildersFrame)",
+    "domain": "Healthcare & Biomedical",
+    "category": "Software",
+    "affected_group": "ASHA and Anganwadi health workers tracking maternal high-risk checkups in low-connectivity blocks",
+    "summary": "Build a lightweight local-first mobile register that flags overdue antenatal visits, tracks hemoglobin/BP danger signs against protocol thresholds, and syncs incrementally over 2G.",
+    "context": "Paper registers and heavy web portals lead to missed follow-ups for high-risk pregnancies and delayed pediatric immunization doses when mobile coverage drops inside rural villages.",
+    "constraints": "Zero cloud dependency during field visits; encrypted local SQLite storage with PIN lock; clear color+icon risk cues (not color-only).",
+    "required_skills": [
+      "Flutter",
+      "Python",
+      "FastAPI",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 8.9,
+    "feasibility_notes": "Publicly documented NHM immunization & ANC visit schedules provide exact ground-truth rule tables. Easy to demo offline toggle + conflict-free sync.",
+    "sources": [
+      {
+        "name": "National Health Mission (NHM) Maternal Health Guidelines",
+        "url": "https://nhm.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Never claim medical diagnosis—frame risk flags strictly as rule-based screening alerts prompting doctor/PHC referral.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Online-only React form storing unencrypted patient data in plain localStorage.",
+        "shortcoming": "Failed completely offline and lacked privacy/access controls for sensitive health records."
+      }
+    ],
+    "sample_solution_direction": "Flutter app with SQLCipher local database + delta sync queue to FastAPI + clear rule-based ANC/vaccine due calendar."
+  },
+  {
+    "id": "bf-306",
+    "code": "BF306",
+    "title": "Smartphone Camera Physiotherapy Range-of-Motion & Exercise Form Tracker for Post-Fracture Rehab",
+    "organization": "Curated Digital Rehab Track (BuildersFrame)",
+    "domain": "Healthcare & Biomedical",
+    "category": "Software",
+    "affected_group": "Outpatient physiotherapy patients recovering at home from knee, shoulder, or elbow injuries",
+    "summary": "Use on-device pose estimation to measure joint flexion/extension angles in degrees, count valid repetitions, and export weekly progress charts for the supervising physiotherapist.",
+    "context": "Patients often discontinue or perform home physiotherapy exercises incorrectly after hospital discharge because weekly clinic travel is costly and subjective self-logs are unreliable.",
+    "constraints": "Must process frames client-side (no raw patient video uploaded to external servers). Handle side-view and front-view camera tolerances clearly.",
+    "required_skills": [
+      "MediaPipe",
+      "OpenCV",
+      "Python",
+      "React",
+      "FastAPI"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 8.8,
+    "feasibility_notes": "MediaPipe Pose Landmarker runs smoothly in browser WebAssembly or Python at 25+ fps. Can be calibrated live during demo for knee extension and shoulder abduction.",
+    "sources": [
+      {
+        "name": "MediaPipe Pose Landmarker Technical Guide",
+        "url": "https://developers.google.com/mediapipe",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Smooth joint angle jitter using a 1-Euro or exponential moving average filter and detect incomplete reps cleanly.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Streamed raw webcam video over WebSockets to a Python server for classification.",
+        "shortcoming": "High latency (>800ms) and violated patient privacy expectations by transmitting home video."
+      }
+    ],
+    "sample_solution_direction": "Browser-side MediaPipe Pose angle computation + smoothed rep state machine syncing only numeric JSON session summaries to FastAPI."
+  },
+  {
+    "id": "bf-307",
+    "code": "BF307",
+    "title": "Solar Cold-Box Thermal Holdover & Compressor Scheduler for Village Milk Collection Centers",
+    "organization": "Curated Clean Energy Track (BuildersFrame)",
+    "domain": "Renewable Energy",
+    "category": "Both",
+    "affected_group": "Rural dairy cooperatives and horticulture collection centers experiencing daytime grid cuts",
+    "summary": "Monitor phase-change thermal bank temperature, solar PV generation, and door-open events to run compressors preferentially during peak solar hours and alert staff before spoilage.",
+    "context": "Raw milk must be chilled below 4–6 °C within hours of milking, yet rural collection centers rely on expensive diesel backup generators whenever afternoon feeder outages occur.",
+    "constraints": "Retrofit onto existing chest chillers without voiding compressor warranty (non-invasive current clamp + DS18B20 probes + smart contactor).",
+    "required_skills": [
+      "IoT / Sensors",
+      "Embedded C/ESP32",
+      "Time Series Forecasting",
+      "Python",
+      "React"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.5,
+    "feasibility_notes": "Easily prototyped with a Peltier cooler box or relay lamp, 2 temperature probes, INA219 solar voltage/current sensor, and live thermal decay dashboard.",
+    "sources": [
+      {
+        "name": "Ministry of New and Renewable Energy (MNRE) Decentralized Cold Storage Briefs",
+        "url": "https://mnre.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Track door-open duration and ambient temperature—frequent afternoon lid openings often cause more thermal loss than compressor sizing.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Simple DHT11 thermometer sending alerts without solar forecast integration.",
+        "shortcoming": "No pre-cooling logic before evening cloud cover or grid outage windows."
+      }
+    ],
+    "sample_solution_direction": "ESP32 telemetry node + hysteresis-aware solar pre-cooling controller predicting hours of thermal holdover remaining."
+  },
+  {
+    "id": "bf-308",
+    "code": "BF308",
+    "title": "Rapid State-of-Health Grader for Repurposing Retired EV Lithium Battery Modules",
+    "organization": "Curated Circular Energy Track (BuildersFrame)",
+    "domain": "Renewable Energy",
+    "category": "Both",
+    "affected_group": "Battery recyclers, campus microgrid labs, and second-life stationary storage integrators",
+    "summary": "Measure short-pulse internal resistance and voltage relaxation curves across retired EV cells to cluster matched modules safe for low-rate solar storage.",
+    "context": "EV packs are often retired at 70–80% remaining capacity, yet manual full charge-discharge cycling takes 8–12 hours per pack, stalling safe second-life sorting.",
+    "constraints": "Keep test pulse under 10 minutes per module with hardware over-temperature/short-circuit cutoff and clear pass/quarantine safety flags.",
+    "required_skills": [
+      "Signal Processing",
+      "Embedded C/ESP32",
+      "Python",
+      "TensorFlow/PyTorch",
+      "Docker"
+    ],
+    "difficulty": "Advanced",
+    "evidence_strength": "High",
+    "builders_rating": 8.9,
+    "feasibility_notes": "NASA Prognostics Center and Oxford Battery Degradation datasets allow training/validating SOH regression models cleanly alongside a safe 18650 bench rig.",
+    "sources": [
+      {
+        "name": "NASA Ames Prognostics Battery Aging Dataset",
+        "url": "https://www.nasa.gov",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Emphasize cell-matching variance: pairing one weak high-resistance cell with healthy cells ruins the whole second-life string.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Used open-circuit voltage alone to estimate battery health.",
+        "shortcoming": "Resting voltage poorly reflects internal impedance fade or thermal runaway risk under load."
+      }
+    ],
+    "sample_solution_direction": "Controlled MOSFET load pulse rig + voltage-recovery curve feature extraction in Python estimating SOH & pack-matching clusters."
+  },
+  {
+    "id": "bf-309",
+    "code": "BF309",
+    "title": "Low-Cost Turbidity, pH & TDS Telemetry for Campus and Hostel Drinking Water Tanks",
+    "organization": "Curated Clean Water Track (BuildersFrame)",
+    "domain": "Clean Water & Sanitation",
+    "category": "Both",
+    "affected_group": "College hostel residents, primary schools, and campus facility maintenance teams",
+    "summary": "Deploy inline bypass sensor pods at overhead storage outlets to detect sudden turbidity spikes, RO membrane failure, or stagnant tank contamination before morning distribution.",
+    "context": "Overhead tanks in hostels and schools often go months without cleaning or sensor checks, leading to seasonal waterborne illness outbreaks discovered only after students fall sick.",
+    "constraints": "Keep total node cost under ₹2,000, separate electronics cleanly from wet chambers, and auto-calibrate drift against reference buffer checkpoints.",
+    "required_skills": [
+      "IoT / Sensors",
+      "Embedded C/ESP32",
+      "Node.js",
+      "React"
+    ],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 8.4,
+    "feasibility_notes": "Gravity/analog turbidity, TDS, and pH probes interface directly with ESP32 ADC + clean React hostel-block maintenance dashboard.",
+    "sources": [
+      {
+        "name": "CPCB Drinking Water Quality Standards (BIS IS 10500 Summary)",
+        "url": "https://cpcb.nic.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Wait for stable flow / pump-idle settling windows before logging turbidity, since air bubbles during tank refilling cause false turbidity spikes.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Submerged unsealed breadboard sensors triggering continuous Slack alerts on bubble noise.",
+        "shortcoming": "Biofouling and air-bubble artifacts caused uncalibrated drift within 48 hours."
+      }
+    ],
+    "sample_solution_direction": "Bypass sampling tee with ESP32 median-filtered TDS/turbidity/pH readings + React alert dashboard tracking tank cleanings."
+  },
+  {
+    "id": "bf-310",
+    "code": "BF310",
+    "title": "Stormwater Drain Siltation & Monsoon Flood Choke-Point Predictor Using Citizen Photos & DEM",
+    "organization": "Curated Urban Water Track (BuildersFrame)",
+    "domain": "Clean Water & Sanitation",
+    "category": "Software",
+    "affected_group": "Municipal sanitation engineers, ward councilors, and low-lying neighborhood residents",
+    "summary": "Combine elevation depression maps, rainfall intensity thresholds, and geotagged pre-monsoon citizen drain photos to prioritize desilting crews at high-impact choke points.",
+    "context": "Urban flash flooding frequently stems not from river overflow alone, but from solid-waste-clogged stormwater culverts along low-lying road intersections.",
+    "constraints": "Work with public SRTM/Cartosat elevation tiles and lightweight image classification so ward supervisors get ranked clearance lists before peak rain.",
+    "required_skills": [
+      "PostGIS / GIS",
+      "Python",
+      "OpenCV",
+      "FastAPI",
+      "React"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.6,
+    "feasibility_notes": "Public 30m DEM data + OpenStreetMap road topology allow computing flow-accumulation sinks for any Indian city ward in a weekend hackathon.",
+    "sources": [
+      {
+        "name": "NDMA Urban Flood Management Guidelines",
+        "url": "https://ndma.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Combine topographic sink severity with downstream road traffic criticality so sanitation teams clear high-leverage culverts first.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Generic pothole/garbage complaint portal with no drainage prioritization.",
+        "shortcoming": "Created long unranked ticket backlogs indistinguishable from routine municipal complaints."
+      }
+    ],
+    "sample_solution_direction": "DEM flow-accumulation sink overlay in PostGIS + FastAPI blockage severity scorer + before/after desilting verification map in React."
+  },
+  {
+    "id": "bf-311",
+    "code": "BF311",
+    "title": "Interactive Tactile & Audio STEM Diagram Converter for Visually Impaired Students",
+    "organization": "Curated Inclusive EdTech Track (BuildersFrame)",
+    "domain": "Smart Education",
+    "category": "Software",
+    "affected_group": "Blind and low-vision high school and engineering students reading textbook circuits, graphs, and biology diagrams",
+    "summary": "Upload textbook photos of circuit schematics, bar charts, or geometric figures and generate structured audio walkthroughs plus embosser-ready SVG tactile layouts with Braille labels.",
+    "context": "Screen readers handle plain text well, yet 80%+ of STEM textbook diagrams—free-body forces, logic gates, plots—remain inaccessible image blocks.",
+    "constraints": "Export valid printable/swell-paper high-contrast SVG with Grade-1 Braille Unicode labels and keyboard-navigable node descriptions.",
+    "required_skills": [
+      "Python",
+      "OpenCV",
+      "YOLOv8/v11",
+      "React",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 9.0,
+    "feasibility_notes": "Focus reliably on one high-value diagram class first (e.g., line/bar charts + basic logic/circuit diagrams) rather than claiming universal diagram parsing.",
+    "sources": [
+      {
+        "name": "W3C Accessible SVG & Graphics Guidelines",
+        "url": "https://www.w3.org/WAI/",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Keyboard arrow navigation across diagram nodes ('Resistor R1 connected between Node A and Ground') makes the web preview immediately testable without a Braille printer.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Passed textbook images to a generic OCR reader.",
+        "shortcoming": "OCR scrambled spatial labels without explaining connections, axes, or topological structure."
+      }
+    ],
+    "sample_solution_direction": "OpenCV contour/component detector + graph topology extractor outputting accessible SVG + Web Speech API keyboard-explored audio tree."
+  },
+  {
+    "id": "bf-312",
+    "code": "BF312",
+    "title": "Interactive Embedded & Digital Logic Lab Simulator with Stepwise Fault Diagnostics for Colleges",
+    "organization": "Curated Engineering Education Track (BuildersFrame)",
+    "domain": "Smart Education",
+    "category": "Software",
+    "affected_group": "First- and second-year ECE/CSE students at colleges with limited oscilloscope and hardware kit availability",
+    "summary": "Provide a browser-based microcontroller GPIO, PWM, and sensor wiring sandbox that highlights common wiring bugs (floating inputs, missing pull-ups, reversed polarity) with guided hints.",
+    "context": "Students in crowded lab batches often wait weeks for scarce lab benches or burn components due to basic wiring errors before learning conceptual timing and protocol debugging.",
+    "constraints": "Run purely in the browser without requiring native desktop installs; include instructor-configurable fault-injection lab assignments.",
+    "required_skills": [
+      "React",
+      "Node.js",
+      "Python",
+      "Docker",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "Medium",
+    "builders_rating": 8.5,
+    "feasibility_notes": "Easy to scope around 5 core lab modules (LED PWM, UART serial framing, I2C address scan, ultrasonic timing, ADC voltage divider) with deterministic circuit rule checks.",
+    "sources": [
+      {
+        "name": "AICTE Model Curriculum Lab Modernization Notes",
+        "url": "https://www.aicte-india.org",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Show an interactive logic-analyzer waveform view alongside the breadboard so students see baud mismatches and debounce bounce visually.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Quiz app showing static circuit photos.",
+        "shortcoming": "Offered no live pin-state simulation or diagnostic explanation when wires were misconnected."
+      }
+    ],
+    "sample_solution_direction": "React SVG breadboard + deterministic node-netlist rule checker + real-time canvas waveform plotter."
+  },
+  {
+    "id": "bf-313",
+    "code": "BF313",
+    "title": "On-Device UPI Payment Request, QR Code & SMS Phishing Risk Inspector for Elderly Users",
+    "organization": "Curated Consumer Cyber Safety Track (BuildersFrame)",
+    "domain": "Cyber Security & Defence",
+    "category": "Software",
+    "affected_group": "Senior citizens, small shopkeepers, and first-time digital payment users vulnerable to collect-request scams",
+    "summary": "Inspect pasted SMS links, UPI intent URIs, and scanned QR payloads offline to explain in plain regional language whether a link actually sends money vs receives money or impersonates a bank domain.",
+    "context": "Social-engineering frauds frequently trick victims into approving UPI 'Collect' requests or scanning tampered QR codes disguised as cashback or KYC refunds.",
+    "constraints": "Zero uploading of personal SMS inbox history; explain specific red flags transparently (lookalike domains, `mode=collect` URI flags, urgency keywords) rather than opaque scores.",
+    "required_skills": [
+      "Flutter",
+      "Python",
+      "FastAPI",
+      "UI/UX (Figma)"
+    ],
+    "difficulty": "Beginner",
+    "evidence_strength": "High",
+    "builders_rating": 8.9,
+    "feasibility_notes": "UPI deep-link URI specification parameters (`pa`, `pn`, `am`, `tr`, `mode`) and domain homoglyph/Levenshtein checks work deterministically offline in milliseconds.",
+    "sources": [
+      {
+        "name": "CERT-In & RBI Digital Payment Safety Advisories",
+        "url": "https://www.cert-in.org.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Make the warning screen unmistakable and jargon-free: 'Warning: Scanning this asks YOU to pay ₹4,999 — it does NOT credit cashback.'",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Required cloud API lookup for every SMS and showed technical regex errors.",
+        "shortcoming": "Users could not understand the warning and sensitive bank SMS text left the phone."
+      }
+    ],
+    "sample_solution_direction": "Flutter QR/URI parser + Punycode/homoglyph domain similarity check + bilingual voice readout warning before opening any payment app."
+  },
+  {
+    "id": "bf-314",
+    "code": "BF314",
+    "title": "LoRa Offline Mesh SOS Beacon & Relief Resource Triage Map for Post-Cyclone Blackout Zones",
+    "organization": "Curated Disaster Resilience Track (BuildersFrame)",
+    "domain": "Disaster Management",
+    "category": "Both",
+    "affected_group": "Coastal panchayats, cyclone shelters, and first-responder volunteers during cellular and power outages",
+    "summary": "Create battery-backed LoRa relay nodes paired with smartphone BLE apps so stranded households can broadcast compact GPS + medical/water triage packets across multi-hop mesh links to district command posts.",
+    "context": "Major coastal cyclones regularly knock out grid power and cell towers for 48–96 hours, leaving relief coordinators blind to isolated wards needing insulin, drinking water, or generator fuel.",
+    "constraints": "Keep SOS payload under 48 bytes for long-range LoRa spreading factors; enforce deduplication TTL hops so mesh traffic does not flood.",
+    "required_skills": [
+      "Embedded C/ESP32",
+      "IoT / Sensors",
+      "PostGIS / GIS",
+      "Flutter",
+      "Python"
+    ],
+    "difficulty": "Intermediate",
+    "evidence_strength": "High",
+    "builders_rating": 9.0,
+    "feasibility_notes": "Demonstrable live using two Heltec/TTGO ESP32 LoRa boards (or serial-simulated relay) feeding an offline Leaflet/MBTiles command map.",
+    "sources": [
+      {
+        "name": "NDMA National Cyclone Risk Mitigation Documentation",
+        "url": "https://ndma.gov.in",
+        "checked_date": "2026-11-25"
+      }
+    ],
+    "checked_date": "2026-11-25",
+    "status": "Active",
+    "hints": "Highlight compact binary packet encoding (lat/lon quantized + urgency bitmask) and store-and-forward acknowledgment so survivors know their SOS reached a relay.",
+    "previous_prototypes": [
+      {
+        "team_name": "Typical Student Prototype Pitfall",
+        "year": "2024",
+        "prototype_summary": "Wi-Fi chat app assuming internet access to load Google Maps tiles.",
+        "shortcoming": "Blank map screen when offline and <80m Wi-Fi range failed across flooded streets."
+      }
+    ],
+    "sample_solution_direction": "ESP32 + SX1278/SX1262 LoRa compact binary mesh relay with BLE phone bridge + cached MBTiles Flutter triage map."
   }
 ]

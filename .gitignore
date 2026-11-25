@@ -54,3 +54,8 @@ venv.bak/
 
 # Temporary runtime logs
 *.log
+
+# Test caches & local Antigravity Studio runtime DB
+.pytest_cache/
+antigravity-studio/.pytest_cache/
+antigravity-studio/*.db

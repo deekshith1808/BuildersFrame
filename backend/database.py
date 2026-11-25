@@ -1,10 +1,28 @@
 import sqlite3
 import json
 import os
+import hashlib
+import hmac
+import secrets
 from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'buildersframe.db')
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+
+def hash_password(password: str) -> str:
+    """Hash a password with a per-user random salt using PBKDF2-HMAC-SHA256."""
+    salt = secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 120_000).hex()
+    return f"{salt}${digest}"
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """Constant-time verification against stored PBKDF2 salt$digest."""
+    try:
+        salt, expected = stored_hash.split('$', 1)
+    except ValueError:
+        return False
+    digest = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 120_000).hex()
+    return hmac.compare_digest(digest, expected)
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -142,93 +160,149 @@ def init_db():
     )
     ''')
 
+    # Users & Profile Table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        full_name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        college TEXT DEFAULT '',
+        level TEXT DEFAULT 'Intermediate',
+        skills TEXT DEFAULT '["Python", "OpenCV", "React", "FastAPI", "Flutter"]',
+        domains TEXT DEFAULT '["Smart Agriculture", "Smart Mobility & Transport", "Healthcare & Biomedical"]',
+        location TEXT DEFAULT 'Coimbatore, Tamil Nadu',
+        team_size INTEGER DEFAULT 4,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    ''')
+
+    # Persistent Auth Sessions Table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS user_sessions (
+        token TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+    ''')
+
+    # Query indexes for scalable filtering and lookups
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_problems_domain ON problems(domain)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_problems_difficulty ON problems(difficulty)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_problems_status ON problems(status)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_hackathons_region ON hackathons(region)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_hackathons_status ON hackathons(status)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_stacks_user ON user_stacks(user_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_community_problem ON community_messages(problem_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_collab_problem ON collaboration_posts(problem_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_sessions_user ON user_sessions(user_id)')
+
     conn.commit()
 
-    # Seed problems if empty
-    cursor.execute('SELECT COUNT(*) as count FROM problems')
+    # Seed sample demo user if users table is empty (does not touch existing users)
+    cursor.execute('SELECT COUNT(*) as count FROM users')
     if cursor.fetchone()['count'] == 0:
-        seed_problems_path = os.path.join(DATA_DIR, 'seed_problems.json')
-        if os.path.exists(seed_problems_path):
-            with open(seed_problems_path, 'r', encoding='utf-8') as f:
-                problems = json.load(f)
-                for p in problems:
-                    cursor.execute('''
-                    INSERT INTO problems (
-                        id, code, title, organization, domain, category,
-                        affected_group, summary, context, constraints,
-                        required_skills, difficulty, evidence_strength,
-                        builders_rating, feasibility_notes, sources,
-                        checked_date, status, hints, previous_prototypes,
-                        sample_solution_direction
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (
-                        p['id'],
-                        p['code'],
-                        p['title'],
-                        p['organization'],
-                        p['domain'],
-                        p['category'],
-                        p['affected_group'],
-                        p['summary'],
-                        p['context'],
-                        p.get('constraints', ''),
-                        json.dumps(p.get('required_skills', [])),
-                        p['difficulty'],
-                        p['evidence_strength'],
-                        p.get('builders_rating', 8.5),
-                        p.get('feasibility_notes', ''),
-                        json.dumps(p.get('sources', [])),
-                        p['checked_date'],
-                        p['status'],
-                        p.get('hints', ''),
-                        json.dumps(p.get('previous_prototypes', [])),
-                        p.get('sample_solution_direction', '')
-                    ))
-            conn.commit()
-            print("Seeded problems successfully.")
+        cursor.execute('''
+        INSERT OR IGNORE INTO users (
+            id, full_name, email, password_hash, college, level, skills, domains, location, team_size
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            'user-demo-builder',
+            'Deekshith M D',
+            'builder@kpriet.ac.in',
+            hash_password('builders2026'),
+            'KPR Institute of Engineering and Technology, Coimbatore',
+            'Intermediate',
+            json.dumps(['Python', 'OpenCV', 'React', 'FastAPI', 'Flutter']),
+            json.dumps(['Smart Agriculture', 'Smart Mobility & Transport', 'Healthcare & Biomedical']),
+            'Coimbatore, Tamil Nadu',
+            4
+        ))
+        conn.commit()
 
-    # Seed hackathons if empty
-    cursor.execute('SELECT COUNT(*) as count FROM hackathons')
-    if cursor.fetchone()['count'] == 0:
-        seed_hackathons_path = os.path.join(DATA_DIR, 'seed_hackathons.json')
-        if os.path.exists(seed_hackathons_path):
-            with open(seed_hackathons_path, 'r', encoding='utf-8') as f:
-                hackathons = json.load(f)
-                for h in hackathons:
-                    cursor.execute('''
-                    INSERT INTO hackathons (
-                        id, name, organizer, location, city, state, country,
-                        region, format, dates, registration_deadline,
-                        status, badge, eligibility, team_size, prize_pool,
-                        themes, judging_criteria, official_url, checked_date,
-                        description, matched_problem_ids
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', (
-                        h['id'],
-                        h['name'],
-                        h['organizer'],
-                        h['location'],
-                        h.get('city', ''),
-                        h.get('state', ''),
-                        h.get('country', 'India'),
-                        h['region'],
-                        h['format'],
-                        h['dates'],
-                        h['registration_deadline'],
-                        h['status'],
-                        h.get('badge', ''),
-                        h.get('eligibility', ''),
-                        h.get('team_size', ''),
-                        h.get('prize_pool', ''),
-                        json.dumps(h.get('themes', [])),
-                        json.dumps(h.get('judging_criteria', [])),
-                        h['official_url'],
-                        h['checked_date'],
-                        h.get('description', ''),
-                        json.dumps(h.get('matched_problem_ids', []))
-                    ))
-            conn.commit()
-            print("Seeded hackathons successfully.")
+    # Sync seed problems non-destructively (INSERT OR IGNORE preserves existing DB edits)
+    seed_problems_path = os.path.join(DATA_DIR, 'seed_problems.json')
+    if os.path.exists(seed_problems_path):
+        with open(seed_problems_path, 'r', encoding='utf-8') as f:
+            problems = json.load(f)
+            for p in problems:
+                cursor.execute('''
+                INSERT OR IGNORE INTO problems (
+                    id, code, title, organization, domain, category,
+                    affected_group, summary, context, constraints,
+                    required_skills, difficulty, evidence_strength,
+                    builders_rating, feasibility_notes, sources,
+                    checked_date, status, hints, previous_prototypes,
+                    sample_solution_direction
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    p['id'],
+                    p['code'],
+                    p['title'],
+                    p['organization'],
+                    p['domain'],
+                    p['category'],
+                    p['affected_group'],
+                    p['summary'],
+                    p['context'],
+                    p.get('constraints', ''),
+                    json.dumps(p.get('required_skills', [])),
+                    p['difficulty'],
+                    p['evidence_strength'],
+                    p.get('builders_rating', 8.5),
+                    p.get('feasibility_notes', ''),
+                    json.dumps(p.get('sources', [])),
+                    p['checked_date'],
+                    p['status'],
+                    p.get('hints', ''),
+                    json.dumps(p.get('previous_prototypes', [])),
+                    p.get('sample_solution_direction', '')
+                ))
+        conn.commit()
+
+    # Sync seed hackathons non-destructively (INSERT OR IGNORE preserves existing DB edits)
+    seed_hackathons_path = os.path.join(DATA_DIR, 'seed_hackathons.json')
+    if os.path.exists(seed_hackathons_path):
+        with open(seed_hackathons_path, 'r', encoding='utf-8') as f:
+            hackathons = json.load(f)
+            for h in hackathons:
+                cursor.execute('''
+                INSERT OR IGNORE INTO hackathons (
+                    id, name, organizer, location, city, state, country,
+                    region, format, dates, registration_deadline,
+                    status, badge, eligibility, team_size, prize_pool,
+                    themes, judging_criteria, official_url, checked_date,
+                    description, matched_problem_ids
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    h['id'],
+                    h['name'],
+                    h['organizer'],
+                    h['location'],
+                    h.get('city', ''),
+                    h.get('state', ''),
+                    h.get('country', 'India'),
+                    h['region'],
+                    h['format'],
+                    h['dates'],
+                    h['registration_deadline'],
+                    h['status'],
+                    h.get('badge', ''),
+                    h.get('eligibility', ''),
+                    h.get('team_size', ''),
+                    h.get('prize_pool', ''),
+                    json.dumps(h.get('themes', [])),
+                    json.dumps(h.get('judging_criteria', [])),
+                    h['official_url'],
+                    h['checked_date'],
+                    h.get('description', ''),
+                    json.dumps(h.get('matched_problem_ids', []))
+                ))
+        conn.commit()
 
     # Seed sample community messages if empty
     cursor.execute('SELECT COUNT(*) as count FROM community_messages')

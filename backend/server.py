@@ -2,26 +2,52 @@ import os
 import sys
 import json
 import sqlite3
+import secrets
 import tornado.ioloop
 import tornado.web
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 # Add project root to sys.path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from backend.database import get_db, init_db
+from backend.database import get_db, init_db, hash_password, verify_password
 from backend.ai_engine import calculate_personalization_match, ProblemResearchAgent
 from backend.fetcher import fetch_and_ingest_problems
 
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
+SESSION_COOKIE_NAME = 'bf_session'
+
+
+def serialize_user(row):
+    if not row:
+        return None
+    u = dict(row)
+    u.pop('password_hash', None)
+    try:
+        u['skills'] = json.loads(u.get('skills') or '[]')
+    except Exception:
+        u['skills'] = []
+    try:
+        u['domains'] = json.loads(u.get('domains') or '[]')
+    except Exception:
+        u['domains'] = []
+    return u
+
 
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
+        origin = self.request.headers.get("Origin", "")
+        if origin.startswith(("http://localhost:", "http://127.0.0.1:", "https://localhost:", "https://127.0.0.1:")):
+            self.set_header("Access-Control-Allow-Origin", origin)
+            self.set_header("Access-Control-Allow-Credentials", "true")
+            self.set_header("Vary", "Origin")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with, content-type, authorization")
         self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
+        self.set_header("X-Content-Type-Options", "nosniff")
+        self.set_header("X-Frame-Options", "SAMEORIGIN")
+        self.set_header("Referrer-Policy", "strict-origin-when-cross-origin")
 
     def options(self, *args, **kwargs):
         self.set_status(204)
@@ -37,6 +63,50 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_status(status)
         self.set_header("Content-Type", "application/json")
         self.write(json.dumps(data))
+
+    def get_session_token(self):
+        auth_header = self.request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            return auth_header[7:].strip()
+        return self.get_cookie(SESSION_COOKIE_NAME)
+
+    def get_current_user(self):
+        token = self.get_session_token()
+        if not token:
+            return None
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT u.*, s.expires_at
+            FROM user_sessions s
+            JOIN users u ON s.user_id = u.id
+            WHERE s.token = ?
+        ''', (token,))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return None
+        if row['expires_at'] < datetime.now(timezone.utc).replace(tzinfo=None).isoformat():
+            cursor.execute("DELETE FROM user_sessions WHERE token = ?", (token,))
+            conn.commit()
+            conn.close()
+            return None
+        user = serialize_user(row)
+        conn.close()
+        return user
+
+    def create_session_cookie(self, user_id):
+        token = secrets.token_urlsafe(32)
+        expires = (datetime.now(timezone.utc) + timedelta(days=14)).replace(tzinfo=None).isoformat()
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO user_sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+            (token, user_id, expires)
+        )
+        conn.commit()
+        conn.close()
+        self.set_cookie(SESSION_COOKIE_NAME, token, httponly=True, path="/", samesite="Lax", expires_days=14)
+        return token
 
 
 class ProblemsListHandler(BaseHandler):
@@ -59,8 +129,15 @@ class ProblemsListHandler(BaseHandler):
             params.extend([q_param, q_param, q_param, q_param, q_param])
 
         if domain:
-            sql += " AND domain = ?"
-            params.append(domain)
+            if domain.startswith("Smart Mobility"):
+                sql += " AND (domain = ? OR domain LIKE 'Smart Mobility%')"
+                params.append(domain)
+            elif domain.startswith("Clean"):
+                sql += " AND (domain = ? OR domain LIKE 'Clean%')"
+                params.append(domain)
+            else:
+                sql += " AND domain = ?"
+                params.append(domain)
 
         if difficulty:
             sql += " AND difficulty = ?"
@@ -74,7 +151,17 @@ class ProblemsListHandler(BaseHandler):
             sql += " AND status = ?"
             params.append(status)
 
-        sql += " ORDER BY builders_rating DESC, created_at DESC"
+        try:
+            limit = min(int(self.get_argument('limit', '200')), 200)
+        except ValueError:
+            limit = 200
+        try:
+            offset = max(int(self.get_argument('offset', '0')), 0)
+        except ValueError:
+            offset = 0
+
+        sql += " ORDER BY builders_rating DESC, created_at DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
         cursor.execute(sql, params)
         rows = cursor.fetchall()
 
@@ -88,6 +175,57 @@ class ProblemsListHandler(BaseHandler):
 
         conn.close()
         self.write_json({"status": "success", "count": len(results), "problems": results})
+
+    def post(self):
+        body = self.get_json_body()
+        code = (body.get('code') or '').strip().upper()[:24]
+        title = (body.get('title') or '').strip()[:240]
+        organization = (body.get('organization') or 'Student / Community Submission').strip()[:160]
+        domain = (body.get('domain') or 'Smart Agriculture').strip()[:100]
+        category = (body.get('category') or 'Software').strip()
+        affected_group = (body.get('affected_group') or 'Targeted end users').strip()[:240]
+        summary = (body.get('summary') or '').strip()[:800]
+        context = (body.get('context') or summary).strip()[:1200]
+        constraints = (body.get('constraints') or '').strip()[:600]
+        required_skills = body.get('required_skills') or []
+        if isinstance(required_skills, str):
+            required_skills = [s.strip() for s in required_skills.split(',') if s.strip()]
+        difficulty = (body.get('difficulty') or 'Intermediate').strip()
+        source_url = (body.get('source_url') or '').strip()
+
+        if not title or not summary:
+            self.write_json({"status": "error", "message": "Title and summary are required"}, status=400)
+            return
+
+        new_id = f"prob-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        final_code = code or f"BF{datetime.now().strftime('%m%d%H%M')}"
+        sources = [{"name": organization, "url": source_url, "checked_date": datetime.now().strftime('%Y-%m-%d')}] if source_url else []
+
+        conn = get_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+            INSERT INTO problems (
+                id, code, title, organization, domain, category,
+                affected_group, summary, context, constraints,
+                required_skills, difficulty, evidence_strength,
+                builders_rating, feasibility_notes, sources,
+                checked_date, status, hints, previous_prototypes,
+                sample_solution_direction
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Medium', 8.0, '', ?, ?, 'Active', '', '[]', '')
+            ''', (
+                new_id, final_code, title, organization, domain, category,
+                affected_group, summary, context, constraints,
+                json.dumps(required_skills), difficulty, json.dumps(sources),
+                datetime.now().strftime('%Y-%m-%d')
+            ))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            conn.close()
+            self.write_json({"status": "error", "message": "A problem with that code already exists"}, status=409)
+            return
+        conn.close()
+        self.write_json({"status": "success", "message": "Problem stored in database", "id": new_id, "code": final_code})
 
 
 class ProblemDetailHandler(BaseHandler):
@@ -121,7 +259,7 @@ class ProblemDetailHandler(BaseHandler):
 class ProblemFetchHandler(BaseHandler):
     def post(self):
         body = self.get_json_body()
-        source_name = body.get('source_name', 'Smart India Hackathon Live Portal')
+        source_name = body.get('source_name', 'Curated Sample Catalog')
         custom_url = body.get('custom_url', None)
 
         report = fetch_and_ingest_problems(source_name=source_name, custom_url=custom_url)
@@ -166,7 +304,17 @@ class HackathonsListHandler(BaseHandler):
                 # Also include National, Global, Online hackathons as universally accessible
                 sql += f" AND ({' OR '.join(token_clauses)} OR region IN ('National', 'Global', 'Online'))"
 
-        sql += " ORDER BY registration_deadline ASC"
+        try:
+            limit = min(int(self.get_argument('limit', '100')), 200)
+        except ValueError:
+            limit = 100
+        try:
+            offset = max(int(self.get_argument('offset', '0')), 0)
+        except ValueError:
+            offset = 0
+
+        sql += " ORDER BY registration_deadline ASC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
         cursor.execute(sql, params)
         rows = cursor.fetchall()
 
@@ -183,24 +331,28 @@ class HackathonsListHandler(BaseHandler):
 
     def post(self):
         body = self.get_json_body()
-        name = body.get('name', '').strip()
-        organizer = body.get('organizer', '').strip()
-        location = body.get('location', '').strip()
-        city = body.get('city', '')
-        state = body.get('state', '')
+        name = body.get('name', '').strip()[:160]
+        organizer = body.get('organizer', '').strip()[:160]
+        location = body.get('location', '').strip()[:120]
+        city = body.get('city', '').strip()[:80]
+        state = body.get('state', '').strip()[:80]
         region = body.get('region', 'Tamil Nadu')
         format_type = body.get('format', 'Hybrid')
-        dates = body.get('dates', '').strip()
-        deadline = body.get('registration_deadline', '').strip()
+        dates = body.get('dates', '').strip()[:80]
+        deadline = body.get('registration_deadline', '').strip()[:40]
         official_url = body.get('official_url', '').strip()
-        fallback_url = body.get('fallback_url', '')
-        prize_pool = body.get('prize_pool', 'Certificate & Awards')
-        eligibility = body.get('eligibility', 'College Students')
-        description = body.get('description', '')
+        fallback_url = body.get('fallback_url', '').strip()
+        prize_pool = body.get('prize_pool', 'Certificate & Awards').strip()[:120]
+        eligibility = body.get('eligibility', 'College Students').strip()[:160]
+        description = body.get('description', '').strip()[:1000]
         themes = body.get('themes', ['Open Innovation'])
 
         if not name or not organizer or not official_url:
             self.write_json({"status": "error", "message": "Name, organizer, and official URL are required"}, status=400)
+            return
+
+        if not (official_url.startswith('http://') or official_url.startswith('https://')):
+            self.write_json({"status": "error", "message": "Official URL must start with http:// or https://"}, status=400)
             return
 
         new_id = f"hack-{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -214,7 +366,7 @@ class HackathonsListHandler(BaseHandler):
             status, badge, eligibility, team_size, prize_pool,
             themes, judging_criteria, official_url, fallback_url,
             verification_status, checked_date, description, matched_problem_ids
-        ) VALUES (?, ?, ?, ?, ?, ?, 'India', ?, ?, ?, ?, 'Upcoming', 'Community Submitted', ?, '2 to 5 members', ?, ?, '[]', ?, ?, 'Community Verified', ?, ?, '[]')
+        ) VALUES (?, ?, ?, ?, ?, ?, 'India', ?, ?, ?, ?, 'Upcoming', 'Community Submitted', ?, '2 to 5 members', ?, ?, '[]', ?, ?, 'Community Submitted (Unverified)', ?, ?, '[]')
         ''', (
             new_id, name, organizer, location, city, state,
             region, format_type, dates, deadline or datetime.now().strftime('%Y-%m-%dT23:59:59'),
@@ -224,7 +376,7 @@ class HackathonsListHandler(BaseHandler):
         conn.commit()
         conn.close()
 
-        self.write_json({"status": "success", "message": "Hackathon submitted and published successfully!", "id": new_id})
+        self.write_json({"status": "success", "message": "Hackathon submitted and queued as Community Submitted (Unverified).", "id": new_id})
 
 
 class HackathonReportHandler(BaseHandler):
@@ -258,18 +410,38 @@ class HackathonReportHandler(BaseHandler):
 class PersonalizationMatchHandler(BaseHandler):
     def post(self):
         body = self.get_json_body()
+        current_user = self.get_current_user()
+
         student_profile = {
-            "level": body.get("level", "Intermediate"),
-            "skills": body.get("skills", []),
-            "domains": body.get("domains", []),
-            "location": body.get("location", "Tamil Nadu"),
-            "team_size": body.get("team_size", 4)
+            "level": body.get("level") or (current_user["level"] if current_user else "Intermediate"),
+            "skills": body.get("skills") if "skills" in body else (current_user["skills"] if current_user else []),
+            "domains": body.get("domains") if "domains" in body else (current_user["domains"] if current_user else []),
+            "location": body.get("location") or (current_user["location"] if current_user else "Tamil Nadu"),
+            "team_size": body.get("team_size") or body.get("teamSize") or (current_user["team_size"] if current_user else 4)
         }
+
+        effective_user_id = current_user["id"] if current_user else body.get("user_id", "student-local-session")
 
         conn = get_db()
         cursor = conn.cursor()
 
-        # Load all problems
+        # Persist updated profile back to SQLite when signed in and requested
+        if current_user and body.get("save_profile", True):
+            cursor.execute('''
+                UPDATE users
+                SET level = ?, skills = ?, domains = ?, location = ?, team_size = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ''', (
+                student_profile["level"],
+                json.dumps(student_profile["skills"]),
+                json.dumps(student_profile["domains"]),
+                student_profile["location"],
+                int(student_profile["team_size"]),
+                current_user["id"]
+            ))
+            conn.commit()
+
+        # Load all active problems
         cursor.execute("SELECT * FROM problems WHERE status = 'Active'")
         prob_rows = cursor.fetchall()
 
@@ -283,6 +455,15 @@ class PersonalizationMatchHandler(BaseHandler):
             hd['matched_problem_ids'] = json.loads(hd['matched_problem_ids']) if hd['matched_problem_ids'] else []
             hackathons.append(hd)
 
+        # Load user's saved stack for stack-synergy scoring
+        cursor.execute('''
+            SELECT s.problem_id, s.stage, p.domain
+            FROM user_stacks s
+            JOIN problems p ON s.problem_id = p.id
+            WHERE s.user_id = ?
+        ''', (effective_user_id,))
+        user_stack = [dict(sr) for sr in cursor.fetchall()]
+
         ranked_problems = []
         for pr in prob_rows:
             prob = dict(pr)
@@ -290,14 +471,14 @@ class PersonalizationMatchHandler(BaseHandler):
             prob['sources'] = json.loads(prob['sources']) if prob['sources'] else []
             prob['previous_prototypes'] = json.loads(prob['previous_prototypes']) if prob['previous_prototypes'] else []
 
-            match_result = calculate_personalization_match(student_profile, prob, hackathons)
+            match_result = calculate_personalization_match(student_profile, prob, hackathons, user_stack=user_stack)
             prob['personalization'] = match_result
             ranked_problems.append(prob)
 
         # Sort descending by match score
         ranked_problems.sort(key=lambda x: x['personalization']['match_score'], reverse=True)
 
-        # Filter recommended hackathons tailored to user's location and top problem matches
+        # Filter recommended hackathons tailored to user's location
         user_loc = student_profile['location'].lower()
         matched_hackathons = []
         for h in hackathons:
@@ -313,6 +494,7 @@ class PersonalizationMatchHandler(BaseHandler):
 
         self.write_json({
             "status": "success",
+            "authenticated": bool(current_user),
             "student_profile": student_profile,
             "ranked_problems": ranked_problems,
             "matched_hackathons": matched_hackathons
@@ -323,6 +505,8 @@ class AIAgentAnalyzeHandler(BaseHandler):
     def post(self):
         body = self.get_json_body()
         problem_id = body.get('problem_id')
+        current_user = self.get_current_user()
+        student_profile = body.get('student_profile') or current_user
 
         conn = get_db()
         cursor = conn.cursor()
@@ -338,7 +522,7 @@ class AIAgentAnalyzeHandler(BaseHandler):
         prob['required_skills'] = json.loads(prob['required_skills']) if prob['required_skills'] else []
         prob['previous_prototypes'] = json.loads(prob['previous_prototypes']) if prob['previous_prototypes'] else []
 
-        research_report = ProblemResearchAgent.run_deep_research(prob)
+        research_report = ProblemResearchAgent.run_deep_research(prob, student_profile=student_profile)
         self.write_json({"status": "success", "research_report": research_report})
 
 
@@ -347,6 +531,8 @@ class AIAgentChatHandler(BaseHandler):
         body = self.get_json_body()
         problem_id = body.get('problem_id')
         user_message = body.get('message', '').strip()
+        current_user = self.get_current_user()
+        student_profile = body.get('student_profile') or current_user
 
         if not user_message:
             self.write_json({"status": "error", "message": "Message is required"}, status=400)
@@ -363,7 +549,7 @@ class AIAgentChatHandler(BaseHandler):
             return
 
         prob = dict(row)
-        response_text = ProblemResearchAgent.answer_problem_query(prob, user_message)
+        response_text = ProblemResearchAgent.answer_problem_query(prob, user_message, student_profile=student_profile)
 
         self.write_json({
             "status": "success",
@@ -375,8 +561,12 @@ class AIAgentChatHandler(BaseHandler):
 
 
 class UserStackHandler(BaseHandler):
+    def _resolve_user_id(self, fallback_arg='student-local-session'):
+        user = self.get_current_user()
+        return user['id'] if user else fallback_arg
+
     def get(self):
-        user_id = self.get_argument('user_id', 'student-local-session')
+        user_id = self._resolve_user_id(self.get_argument('user_id', 'student-local-session'))
         conn = get_db()
         cursor = conn.cursor()
 
@@ -407,7 +597,7 @@ class UserStackHandler(BaseHandler):
 
     def post(self):
         body = self.get_json_body()
-        user_id = body.get('user_id', 'student-local-session')
+        user_id = self._resolve_user_id(body.get('user_id', 'student-local-session'))
         problem_id = body.get('problem_id')
         stage = body.get('stage', 'exploring').lower()
         notes = body.get('notes', '')
@@ -454,7 +644,7 @@ class UserStackHandler(BaseHandler):
         self.write_json({"status": "success", "message": f"Updated stack for {problem_id} to stage '{stage}'"})
 
     def delete(self):
-        user_id = self.get_argument('user_id', 'student-local-session')
+        user_id = self._resolve_user_id(self.get_argument('user_id', 'student-local-session'))
         problem_id = self.get_argument('problem_id', '')
 
         if not problem_id:
@@ -636,10 +826,9 @@ class ProjectBriefExportHandler(BaseHandler):
 
         prob = dict(row)
 
-        # Generate markdown brief per PDF Page 3 & 4
         md = f"""# BUILDERSFRAME PROJECT BRIEF
 **Document Generated**: {datetime.now().strftime("%B %d, %Y - %I:%M %p")}
-**Target Initiative**: Smart India Hackathon & Collegiate Engineering Competitions
+**Target Initiative**: Collegiate & Smart India Hackathon Build Plan
 
 ---
 
@@ -647,38 +836,38 @@ class ProjectBriefExportHandler(BaseHandler):
 - **Problem Code & Title**: {prob['code']} - {prob['title']}
 - **Originating Organization**: {prob['organization']}
 - **Domain**: {prob['domain']} | **Category**: {prob['category']}
-- **BuildersFrame Rating**: {prob['builders_rating']}/10 | **Evidence Strength**: {prob['evidence_strength']}
+- **Curated Feasibility Note**: {prob['builders_rating']}/10 | **Evidence Level**: {prob['evidence_strength']}
 
-## 2. Who is Affected & Ground Reality
-**Target Audience / Beneficiaries**:
+## 2. Who is Affected & Problem Context
+**Target Group**:
 {prob['affected_group']}
 
 **Context & Core Bottleneck**:
 {prob['context']}
 
-**Key Operational Constraints**:
+**Stated Operational Constraints**:
 {prob['constraints']}
 
 ## 3. Team & Ownership
 - **Project Team Name**: {team_name}
 - **Members & Roles**: {', '.join(members)}
 
-## 4. Proposed Solution Direction & Unfair Advantage
+## 4. Suggested Starting Direction (Template-Guided)
 {solution_direction if solution_direction else prob['sample_solution_direction']}
 
-## 5. Critical Assumptions to Validate Before Code
+## 5. Draft Assumptions to Validate Before Building
 """
         for i, asm in enumerate(assumptions, 1):
             md += f"{i}. {asm}\n"
 
         md += f"""
-## 6. Success Metrics for 36-Hour Prototype
+## 6. Success Metrics for First Prototype
 {success_metric}
 
-## 7. Official Source Attribution
-- Official Reference: {prob['sources']}
-- Verification Timestamp: {prob['checked_date']}
-- *BuildersFrame is an independent decision directory. Source facts and editorial ratings remain strictly delineated.*
+## 7. Source Reference & Check Date
+- Listed Sources: {prob['sources']}
+- Record Last Checked: {prob['checked_date']}
+- *BuildersFrame is an independent directory. Source references, curated notes, and suggested starting directions remain strictly separated.*
 """
         self.write_json({
             "status": "success",
@@ -698,8 +887,171 @@ class FetchLogsHandler(BaseHandler):
         self.write_json({"status": "success", "logs": logs})
 
 
+class LoginPageHandler(tornado.web.RequestHandler):
+    def get(self):
+        login_path = os.path.join(STATIC_DIR, 'login.html')
+        if os.path.exists(login_path):
+            self.set_header("Content-Type", "text/html; charset=utf-8")
+            with open(login_path, 'r', encoding='utf-8') as f:
+                self.write(f.read())
+        else:
+            self.set_status(404)
+            self.write("Login page not found")
+
+
+class AuthRegisterHandler(BaseHandler):
+    def post(self):
+        body = self.get_json_body()
+        full_name = (body.get('full_name') or '').strip()[:120]
+        email = (body.get('email') or '').strip().lower()[:160]
+        password = body.get('password') or ''
+        college = (body.get('college') or '').strip()[:160]
+        level = (body.get('level') or 'Intermediate').strip().capitalize()
+        skills = body.get('skills') or ['Python', 'React']
+        domains = body.get('domains') or ['Smart Agriculture', 'Smart Mobility & Transport']
+        location = (body.get('location') or 'Coimbatore, Tamil Nadu').strip()[:120]
+        try:
+            team_size = max(1, min(6, int(body.get('team_size') or 4)))
+        except (TypeError, ValueError):
+            team_size = 4
+
+        if not full_name or not email or '@' not in email:
+            self.write_json({"status": "error", "message": "Valid full name and email are required"}, status=400)
+            return
+        if len(password) < 6:
+            self.write_json({"status": "error", "message": "Password must be at least 6 characters"}, status=400)
+            return
+        if level not in ('Beginner', 'Intermediate', 'Advanced'):
+            level = 'Intermediate'
+
+        user_id = f"user-{secrets.token_hex(8)}"
+        pw_hash = hash_password(password)
+
+        conn = get_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+                INSERT INTO users (id, full_name, email, password_hash, college, level, skills, domains, location, team_size)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                user_id, full_name, email, pw_hash, college, level,
+                json.dumps(skills), json.dumps(domains), location, team_size
+            ))
+            conn.commit()
+            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            user = serialize_user(cursor.fetchone())
+        except sqlite3.IntegrityError:
+            conn.close()
+            self.write_json({"status": "error", "message": "An account with this email already exists"}, status=409)
+            return
+        conn.close()
+
+        self.create_session_cookie(user_id)
+        self.write_json({"status": "success", "authenticated": True, "user": user})
+
+
+class AuthLoginHandler(BaseHandler):
+    def post(self):
+        body = self.get_json_body()
+        email = (body.get('email') or '').strip().lower()
+        password = body.get('password') or ''
+
+        if not email or not password:
+            self.write_json({"status": "error", "message": "Email and password are required"}, status=400)
+            return
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if not row or not verify_password(password, row['password_hash']):
+            self.write_json({"status": "error", "message": "Invalid email or password"}, status=401)
+            return
+
+        user = serialize_user(row)
+        self.create_session_cookie(user['id'])
+        self.write_json({"status": "success", "authenticated": True, "user": user})
+
+
+class AuthLogoutHandler(BaseHandler):
+    def post(self):
+        token = self.get_session_token()
+        if token:
+            conn = get_db()
+            conn.execute("DELETE FROM user_sessions WHERE token = ?", (token,))
+            conn.commit()
+            conn.close()
+        self.clear_cookie(SESSION_COOKIE_NAME, path="/")
+        self.write_json({"status": "success", "authenticated": False})
+
+
+class AuthMeHandler(BaseHandler):
+    def get(self):
+        user = self.get_current_user()
+        self.write_json({
+            "status": "success",
+            "authenticated": bool(user),
+            "user": user
+        })
+
+
+class AuthProfileHandler(BaseHandler):
+    def _update_profile(self):
+        user = self.get_current_user()
+        if not user:
+            self.write_json({"status": "error", "message": "Sign in required to save profile"}, status=401)
+            return
+
+        body = self.get_json_body()
+        full_name = (body.get('full_name') or user['full_name']).strip()[:120]
+        college = (body.get('college') if 'college' in body else user.get('college', '')).strip()[:160]
+        level = (body.get('level') or user.get('level', 'Intermediate')).strip().capitalize()
+        if level not in ('Beginner', 'Intermediate', 'Advanced'):
+            level = 'Intermediate'
+        skills = body.get('skills') if 'skills' in body else user.get('skills', [])
+        domains = body.get('domains') if 'domains' in body else user.get('domains', [])
+        location = (body.get('location') or user.get('location', 'Coimbatore, Tamil Nadu')).strip()[:120]
+        try:
+            team_size = max(1, min(6, int(body.get('team_size') or body.get('teamSize') or user.get('team_size', 4))))
+        except (TypeError, ValueError):
+            team_size = 4
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE users
+            SET full_name = ?, college = ?, level = ?, skills = ?, domains = ?, location = ?, team_size = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (full_name, college, level, json.dumps(skills), json.dumps(domains), location, team_size, user['id']))
+        conn.commit()
+        cursor.execute("SELECT * FROM users WHERE id = ?", (user['id'],))
+        updated_user = serialize_user(cursor.fetchone())
+        conn.close()
+
+        self.write_json({"status": "success", "user": updated_user})
+
+    def put(self):
+        self._update_profile()
+
+    def post(self):
+        self._update_profile()
+
+
+class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        self.set_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+
+
 def make_app():
     return tornado.web.Application([
+        (r"/login", LoginPageHandler),
+        (r"/api/auth/register", AuthRegisterHandler),
+        (r"/api/auth/login", AuthLoginHandler),
+        (r"/api/auth/logout", AuthLogoutHandler),
+        (r"/api/auth/me", AuthMeHandler),
+        (r"/api/auth/profile", AuthProfileHandler),
         (r"/api/problems", ProblemsListHandler),
         (r"/api/problems/fetch", ProblemFetchHandler),
         (r"/api/problems/([a-zA-Z0-9_\-]+)", ProblemDetailHandler),
@@ -714,7 +1066,7 @@ def make_app():
         (r"/api/collaboration", CollaborationHandler),
         (r"/api/project-brief", ProjectBriefExportHandler),
         (r"/api/fetch-logs", FetchLogsHandler),
-        (r"/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_DIR, "default_filename": "index.html"}),
+        (r"/(.*)", NoCacheStaticFileHandler, {"path": STATIC_DIR, "default_filename": "index.html"}),
     ], debug=True)
 
 

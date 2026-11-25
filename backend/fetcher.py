@@ -27,21 +27,20 @@ DISCOVERABLE_CHALLENGES = [
         "feasibility_notes": "High impact for railway tracks. Students can demonstrate with a 1-meter steel rail sample, small piezoelectric sensor, and LED fracture indicator.",
         "sources": [
             {
-                "name": "SIH 2025/2026 Railway Board Track Safety PS",
-                "url": "https://sih.gov.in/railway-track-ps2041",
-                "checked_date": "2026-11-20"
+                "name": "Smart India Hackathon Portal (Railway Track Safety Reference)",
+                "url": "https://sih.gov.in",
+                "checked_date": "2026-11-25"
             }
         ],
-        "checked_date": "2026-11-22",
+        "checked_date": "2026-11-25",
         "status": "Active",
         "hints": "Differentiate between normal train wheel clatter frequencies (10Hz - 2kHz) versus high-frequency acoustic emissions (>20kHz) caused by crystal micro-shearing in steel.",
         "previous_prototypes": [
             {
-                "team_name": "RailGuardians",
+                "team_name": "Typical Student Prototype Pitfall",
                 "year": "2023",
                 "prototype_summary": "Mounted an optical camera on train engine.",
-                "shortcoming": "Could not see internal rail hair-line fractures covered by dust or at night.",
-                "repo_url": "https://github.com/example/railguardians-vision"
+                "shortcoming": "Could not see internal rail hair-line fractures covered by dust or at night."
             }
         ],
         "sample_solution_direction": "Ultrasonic guided-wave transducer attached to rail web + threshold envelope detector triggering Sub-1GHz RF packet."
@@ -65,20 +64,19 @@ DISCOVERABLE_CHALLENGES = [
         "sources": [
             {
                 "name": "BEE Carbon Credit Trading Scheme Framework",
-                "url": "https://beeindia.gov.in/carbon-market",
-                "checked_date": "2026-11-15"
+                "url": "https://beeindia.gov.in",
+                "checked_date": "2026-11-25"
             }
         ],
-        "checked_date": "2026-11-23",
+        "checked_date": "2026-11-25",
         "status": "Active",
         "hints": "Judges love automated auditing: if the inverter logs 100 kWh delivered to the grid, the smart contract mints 0.08 verified carbon tokens without manual paper audits.",
         "previous_prototypes": [
             {
-                "team_name": "GreenLedger",
+                "team_name": "Typical Student Prototype Pitfall",
                 "year": "2024",
                 "prototype_summary": "Manual upload of PDF solar electricity bills for verification.",
-                "shortcoming": "High human verification bottleneck and vulnerable to fake photoshopped PDF bills.",
-                "repo_url": "https://github.com/example/greenledger-web"
+                "shortcoming": "High human verification bottleneck and vulnerable to fake photoshopped PDF bills."
             }
         ],
         "sample_solution_direction": "Cryptographic inverter telemetry verification via MQTT + ERC-20 / ERC-1155 micro-credit issuance on Polygon or Arbitrum."
@@ -111,55 +109,69 @@ DISCOVERABLE_CHALLENGES = [
         "hints": "Feature a dynamic graph router that dynamically marks road edges as impassable when water depth exceeds 0.5m based on video segmentation.",
         "previous_prototypes": [
             {
-                "team_name": "RescueNet",
+                "team_name": "Typical Student Prototype Pitfall",
                 "year": "2023",
                 "prototype_summary": "Static map showing pin drops of user locations.",
-                "shortcoming": "Did not check whether the route between rescuer and stranded citizen was flooded or blocked by submerged electrical transformers.",
-                "repo_url": "https://github.com/example/rescuenet-sos"
+                "shortcoming": "Did not check whether the route between rescuer and stranded citizen was flooded or blocked by submerged electrical transformers."
             }
         ],
         "sample_solution_direction": "Semantic segmentation of water surfaces from aerial drone frames + cost-weighted Dijkstra navigation on OpenStreetMap road vectors."
     }
 ]
 
-def fetch_and_ingest_problems(source_name="Smart India Hackathon Live Portal", custom_url=None):
+def fetch_and_ingest_problems(source_name="Curated Sample Catalog", custom_url=None):
     """
-    Fetches newly announced or live problem statements from official feeds / catalog.
-    Checks for duplicates, tracks rights basis, and persists to the database.
-    Returns: {status, fetched_count, new_count, new_problems: []}
+    Loads challenges from a user-provided JSON feed URL (if valid and reachable)
+    or falls back to the local curated catalog (DISCOVERABLE_CHALLENGES).
+    Checks for duplicates and persists new records to SQLite.
     """
     conn = get_db()
     cursor = conn.cursor()
 
-    url = custom_url if custom_url else "https://sih.gov.in/api/v1/problem-statements"
+    clean_url = (custom_url or "").strip()
+    url = clean_url if clean_url else "local://curated-discoverable-catalog"
     fetched_count = 0
     new_count = 0
     new_problems = []
+    remote_error = None
+    used_remote = False
 
-    # If user provided a real online JSON URL, attempt to read it
+    # If user provided a custom JSON feed URL, attempt a bounded remote fetch
     remote_data = None
-    if custom_url and (custom_url.startswith("http://") or custom_url.startswith("https://")):
-        try:
-            req = urllib.request.Request(
-                custom_url,
-                headers={'User-Agent': 'BuildersFrame-Harvester/1.0'}
-            )
-            with urllib.request.urlopen(req, timeout=5) as response:
-                content = response.read().decode('utf-8')
-                remote_data = json.loads(content)
-        except Exception as e:
-            # Fall back gracefully to curated discoverable dataset with log note
-            pass
+    if clean_url:
+        if clean_url.startswith("http://") or clean_url.startswith("https://"):
+            try:
+                req = urllib.request.Request(
+                    clean_url,
+                    headers={'User-Agent': 'BuildersFrame-Harvester/1.0'}
+                )
+                with urllib.request.urlopen(req, timeout=5) as response:
+                    raw_bytes = response.read(512 * 1024)
+                    content = raw_bytes.decode('utf-8')
+                    parsed = json.loads(content)
+                    if isinstance(parsed, list) and len(parsed) > 0:
+                        remote_data = parsed
+                        used_remote = True
+                    else:
+                        remote_error = "Remote JSON was empty or not a list; used local curated catalog instead."
+            except Exception as e:
+                remote_error = f"Remote feed unreachable ({str(e)[:80]}); loaded local curated catalog instead."
+        else:
+            remote_error = "Invalid URL scheme (must be http:// or https://); loaded local curated catalog instead."
 
-    # Use remote data if valid array, otherwise use curated discoverable challenges pool
-    pool = remote_data if isinstance(remote_data, list) and len(remote_data) > 0 else DISCOVERABLE_CHALLENGES
+    pool = remote_data if used_remote else DISCOVERABLE_CHALLENGES
+    effective_source = source_name if used_remote else f"{source_name} (Curated Local Catalog)"
     fetched_count = len(pool)
 
     for item in pool:
-        code = item.get("code")
-        title = item.get("title")
+        if not isinstance(item, dict):
+            continue
+        code = (item.get("code") or "").strip()
+        title = (item.get("title") or "").strip()
+        if not title:
+            continue
 
-        # Check if code already exists
+        # Check if code or title already exists
         cursor.execute("SELECT id FROM problems WHERE code = ? OR title = ?", (code, title))
         existing = cursor.fetchone()
 
@@ -176,8 +188,8 @@ def fetch_and_ingest_problems(source_name="Smart India Hackathon Live Portal", c
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 new_id,
-                item.get("code"),
-                item.get("title"),
+                code or new_id.upper(),
+                title,
                 item.get("organization", "Central Ministry"),
                 item.get("domain", "General Innovation"),
                 item.get("category", "Software"),
@@ -190,7 +202,7 @@ def fetch_and_ingest_problems(source_name="Smart India Hackathon Live Portal", c
                 item.get("evidence_strength", "High"),
                 item.get("builders_rating", 8.8),
                 item.get("feasibility_notes", ""),
-                json.dumps(item.get("sources", [{"name": source_name, "url": url, "checked_date": datetime.now().strftime("%Y-%m-%d")}])),
+                json.dumps(item.get("sources", [{"name": effective_source, "url": url, "checked_date": datetime.now().strftime("%Y-%m-%d")}])),
                 datetime.now().strftime("%Y-%m-%d"),
                 item.get("status", "Active"),
                 item.get("hints", ""),
@@ -199,23 +211,27 @@ def fetch_and_ingest_problems(source_name="Smart India Hackathon Live Portal", c
             ))
             new_count += 1
             new_problems.append({
-                "code": code,
+                "code": code or new_id.upper(),
                 "title": title,
                 "domain": item.get("domain"),
                 "difficulty": item.get("difficulty")
             })
+
+    log_status = "Partial" if remote_error else "Success"
+    base_msg = f"Checked {fetched_count} catalog entries. Added {new_count} new items, skipped {fetched_count - new_count} existing duplicates."
+    full_msg = f"{remote_error} {base_msg}" if remote_error else base_msg
 
     # Log the fetch operation
     cursor.execute('''
     INSERT INTO fetch_logs (source_name, source_url, fetched_count, new_count, status, message)
     VALUES (?, ?, ?, ?, ?, ?)
     ''', (
-        source_name,
+        effective_source,
         url,
         fetched_count,
         new_count,
-        "Success",
-        f"Fetched {fetched_count} challenges. Ingested {new_count} new entries, skipped {fetched_count - new_count} duplicates."
+        log_status,
+        full_msg
     ))
 
     conn.commit()
@@ -223,8 +239,10 @@ def fetch_and_ingest_problems(source_name="Smart India Hackathon Live Portal", c
 
     return {
         "status": "success",
-        "source_name": source_name,
+        "source_name": effective_source,
         "source_url": url,
+        "used_remote": used_remote,
+        "notice": remote_error,
         "fetched_count": fetched_count,
         "new_count": new_count,
         "new_problems": new_problems,

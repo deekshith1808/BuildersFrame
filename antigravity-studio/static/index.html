@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Studio 2.0 — Local Agent Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="workbench-shell">
+    <!-- Top Application Chrome Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="icon-btn mobile-only" id="toggleSidebarBtn" aria-label="Toggle sidebar" onclick="toggleLeftSidebar()">☰</button>
+        <div class="brand-lockup">
+          <span class="brand-glyph" aria-hidden="true">AG</span>
+          <div>
+            <span class="brand-title">Antigravity Studio</span>
+            <span class="brand-ver">2.0</span>
+          </div>
+        </div>
+
+        <div class="project-pill" title="Active Workspace">
+          <label for="projectSelect" class="sr-only">Active Workspace</label>
+          <select id="projectSelect" onchange="switchProject(this.value)"></select>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <span class="runtime-badge" id="runtimeModeBadge" title="Agent execution mode">Local Workspace Agent</span>
+        <span class="policy-badge" id="policyModeBadge" title="Tool execution policy">proceed-in-sandbox</span>
+        <button type="button" class="btn-ghost btn-sm" onclick="openSettingsModal()">Settings</button>
+        <button type="button" class="icon-btn" id="toggleInspectorBtn" aria-label="Toggle Auxiliary Inspector Pane" onclick="toggleRightPane()">Panel</button>
+      </div>
+    </header>
+
+    <!-- Main 3-Pane Body -->
+    <div class="panes-grid" id="panesGrid">
+      <!-- LEFT SIDEBAR -->
+      <aside class="left-sidebar" id="leftSidebar" aria-label="Workspace navigation">
+        <div class="sidebar-top-action">
+          <button type="button" class="btn-primary btn-full" onclick="createNewConversation()">
+            <span>+ New Conversation</span>
+          </button>
+        </div>
+
+        <nav class="sidebar-section-tabs" role="tablist" aria-label="Sidebar panels">
+          <button type="button" class="side-tab active" data-side="chats" onclick="selectSidebarTab('chats')">Chats</button>
+          <button type="button" class="side-tab" data-side="projects" onclick="selectSidebarTab('projects')">Projects</button>
+          <button type="button" class="side-tab" data-side="schedules" onclick="selectSidebarTab('schedules')">Cron</button>
+          <button type="button" class="side-tab" data-side="skills" onclick="selectSidebarTab('skills')">Skills</button>
+        </nav>
+
+        <!-- Sidebar Tab: Conversations -->
+        <div class="sidebar-pane active" id="sidePaneChats">
+          <input type="text" id="convFilterInput" class="sidebar-search" placeholder="Filter conversations..." oninput="renderConversationsList()">
+          <div class="sidebar-list" id="conversationsList"></div>
+        </div>
+
+        <!-- Sidebar Tab: Projects / Workspaces -->
+        <div class="sidebar-pane" id="sidePaneProjects" hidden>
+          <div class="sidebar-list" id="projectsList"></div>
+          <form class="sidebar-mini-form" onsubmit="event.preventDefault(); addWorkspaceProject();">
+            <div class="mini-form-title">Add Workspace Folder</div>
+            <input type="text" id="newProjName" placeholder="Project name" required>
+            <input type="text" id="newProjPath" placeholder="/absolute/path/to/repo" required>
+            <button type="submit" class="btn-secondary btn-sm btn-full">Attach Workspace</button>
+          </form>
+        </div>
+
+        <!-- Sidebar Tab: Scheduled Tasks -->
+        <div class="sidebar-pane" id="sidePaneSchedules" hidden>
+          <div class="sidebar-list" id="scheduledTasksList"></div>
+          <form class="sidebar-mini-form" onsubmit="event.preventDefault(); createScheduledTask();">
+            <div class="mini-form-title">New Scheduled Prompt</div>
+            <input type="text" id="newSchedName" placeholder="Task title" required>
+            <input type="text" id="newSchedCron" placeholder="Cron (e.g. 0 9 * * *)" value="*/30 * * * *" required>
+            <textarea id="newSchedPrompt" rows="2" placeholder="/review Check git status..." required></textarea>
+            <button type="submit" class="btn-secondary btn-sm btn-full">Save Schedule</button>
+          </form>
+        </div>
+
+        <!-- Sidebar Tab: Skills & Customizations -->
+        <div class="sidebar-pane" id="sidePaneSkills" hidden>
+          <div class="sidebar-section-note">Discovered Skills, Rules &amp; Slash Commands</div>
+          <div class="sidebar-list" id="skillsList"></div>
+        </div>
+      </aside>
+
+      <!-- CENTER CHAT CANVAS -->
+      <main class="chat-canvas" id="chatCanvas">
+        <div class="chat-header-bar">
+          <div>
+            <h1 class="chat-conv-title" id="activeConvTitle">Loading conversation...</h1>
+            <div class="chat-conv-meta" id="activeConvMeta">Ready</div>
+          </div>
+          <div class="quick-prompts-row">
+            <button type="button" class="chip-btn" onclick="insertPromptText('/plan ')">/plan</button>
+            <button type="button" class="chip-btn" onclick="insertPromptText('/teamwork ')">/teamwork</button>
+            <button type="button" class="chip-btn" onclick="insertPromptText('/review')">/review</button>
+            <button type="button" class="chip-btn" onclick="insertPromptText('/search ')">/search</button>
+          </div>
+        </div>
+
+        <div class="messages-scroll" id="messagesScroll"></div>
+
+        <!-- Composer Area -->
+        <div class="composer-wrap" id="composerDropZone">
+          <!-- Autocomplete Popover for `/` and `@` -->
+          <div class="autocomplete-popover" id="autocompletePopover" hidden role="listbox" aria-label="Suggestions"></div>
+
+          <div class="attached-files-strip" id="attachedFilesStrip" hidden></div>
+
+          <form class="composer-box" onsubmit="event.preventDefault(); sendChatMessage();">
+            <textarea
+              id="chatInput"
+              rows="2"
+              placeholder="Ask Antigravity Studio... Type '/' for commands, '@' to mention files or skills, Enter to send"
+              oninput="handleComposerInput(this)"
+              onkeydown="handleComposerKeydown(event)"
+            ></textarea>
+
+            <div class="composer-toolbar">
+              <div class="composer-tools-left">
+                <label class="btn-ghost btn-xs file-upload-label" title="Attach files or screenshots">
+                  + Attach
+                  <input type="file" id="fileUploadInput" multiple hidden onchange="handleFileSelection(this.files)">
+                </label>
+                <select id="modelSelect" class="model-select" aria-label="Model selector">
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                  <option value="local-agent">Local Tool Agent</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-primary btn-sm" id="sendMsgBtn">Send →</button>
+            </div>
+          </form>
+        </div>
+      </main>
+
+      <!-- RIGHT HTML AUXILIARY INSPECTOR PANE -->
+      <aside class="inspector-pane" id="inspectorPane" aria-label="Auxiliary inspector">
+        <div class="inspector-tabs" role="tablist" aria-label="Inspector sections">
+          <button type="button" class="insp-tab active" data-insp="subagents" onclick="selectInspectorTab('subagents')">
+            Subagents <span class="tab-count" id="cntSubagents">0</span>
+          </button>
+          <button type="button" class="insp-tab" data-insp="tasks" onclick="selectInspectorTab('tasks')">
+            Tasks <span class="tab-count" id="cntTasks">0</span>
+          </button>
+          <button type="button" class="insp-tab" data-insp="artifacts" onclick="selectInspectorTab('artifacts')">
+            Artifacts <span class="tab-count" id="cntArtifacts">0</span>
+          </button>
+          <button type="button" class="insp-tab" data-insp="files" onclick="selectInspectorTab('files')">
+            Files <span class="tab-count" id="cntFiles">0</span>
+          </button>
+          <button type="button" class="insp-tab" data-insp="terminal" onclick="selectInspectorTab('terminal')">
+            Terminal
+          </button>
+        </div>
+
+        <div class="inspector-body">
+          <div class="insp-panel active" id="inspSubagents"></div>
+          <div class="insp-panel" id="inspTasks" hidden></div>
+          <div class="insp-panel" id="inspArtifacts" hidden></div>
+          <div class="insp-panel" id="inspFiles" hidden></div>
+          <div class="insp-panel" id="inspTerminal" hidden>
+            <div class="terminal-output" id="terminalOutput"></div>
+            <form class="terminal-form" onsubmit="event.preventDefault(); runTerminalCommand();">
+              <span class="term-prompt">$</span>
+              <input type="text" id="terminalCmdInput" placeholder="ls, git status, python3 -m py_compile ..." autocomplete="off">
+              <button type="submit" class="btn-secondary btn-xs">Run</button>
+            </form>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal" hidden role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="settingsTitle">Antigravity 2.0 Settings &amp; Policies</h2>
+        <button type="button" class="icon-btn" onclick="closeSettingsModal()">✕</button>
+      </div>
+      <form class="modal-body" onsubmit="event.preventDefault(); saveSettings();">
+        <div class="field-group">
+          <label for="setGeminiKey">Gemini API Key (Optional — enables Live Gemini Function Calling)</label>
+          <input type="password" id="setGeminiKey" placeholder="Paste AI Studio GEMINI_API_KEY or leave blank for Local Agent">
+          <small id="setGeminiKeyStatus" class="field-hint">Not configured (running Local Workspace Tool-Agent).</small>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field-group">
+            <label for="setPolicy">Tool Execution Policy</label>
+            <select id="setPolicy">
+              <option value="proceed-in-sandbox">proceed-in-sandbox</option>
+              <option value="request-review">request-review</option>
+              <option value="always-proceed">always-proceed</option>
+              <option value="strict">strict (read-only terminal)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="setTheme">Appearance Theme</label>
+            <select id="setTheme">
+              <option value="dark">Carbon Dark</option>
+              <option value="light">Studio Light</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-grid-2">
+          <div class="field-group">
+            <label for="setNonWorkspace">Non-Workspace File Access</label>
+            <select id="setNonWorkspace">
+              <option value="ask">ask</option>
+              <option value="deny">deny</option>
+              <option value="allow">allow</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="setInternet">Internet Access Policy</label>
+            <select id="setInternet">
+              <option value="ask">ask (allow API if key set)</option>
+              <option value="allow">allow</option>
+              <option value="deny">deny (strictly offline)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" onclick="closeSettingsModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

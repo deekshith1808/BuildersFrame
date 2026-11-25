@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — BuildersFrame</title>
+  <meta name="description" content="Sign in or create a BuildersFrame student account to save your skill profile, problem stack, and tailored project plans.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2316241B'/><text x='50%' y='66%' font-size='52' font-weight='700' fill='%23FAF9EF' text-anchor='middle' font-family='sans-serif'>BF</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .auth-page-shell {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-header {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .auth-main {
+      flex: 1;
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 3rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .auth-intro-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .auth-intro-col h1 {
+      font-size: clamp(1.85rem, 3.2vw, 2.55rem);
+      line-height: 1.12;
+      color: var(--text-main);
+    }
+    .auth-intro-col p {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 46ch;
+    }
+    .auth-benefits {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.4rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .auth-benefits li {
+      padding-left: 0.9rem;
+      border-left: 2px solid var(--border-sage);
+    }
+    .auth-benefits strong {
+      color: var(--text-main);
+    }
+
+    .auth-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 1.65rem 1.75rem;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      min-width: 0;
+    }
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .auth-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-xs);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .auth-tab-btn.active {
+      background: var(--color-primary);
+      color: var(--text-inverse);
+    }
+    .auth-field {
+      margin-bottom: 0.9rem;
+    }
+    .auth-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+    }
+    .auth-input {
+      width: 100%;
+      padding: 0.56rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface-subtle);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .auth-input:focus {
+      background: var(--bg-surface);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(163, 177, 156, 0.25);
+    }
+    .auth-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .auth-alert {
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.83rem;
+      font-weight: 600;
+      margin-bottom: 0.95rem;
+      display: none;
+    }
+    .auth-alert.error {
+      display: block;
+      background: var(--color-danger-soft);
+      color: var(--color-danger);
+      border: 1px solid rgba(153, 27, 27, 0.25);
+    }
+    .auth-alert.success {
+      display: block;
+      background: var(--color-success-soft);
+      color: var(--color-success);
+      border: 1px solid rgba(26, 92, 56, 0.25);
+    }
+    .demo-account-box {
+      margin-top: 1.15rem;
+      padding: 0.85rem 0.95rem;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 900px) {
+      .auth-main {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.75rem;
+        padding: 1rem 1rem 2.5rem 1rem;
+      }
+    }
+    @media (max-width: 560px) {
+      .auth-card {
+        padding: 1.25rem 1.1rem;
+      }
+      .auth-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .auth-header {
+        padding: 0.85rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page-shell">
+    <header class="auth-header">
+      <a href="/" class="brand-wrapper" style="text-decoration:none;">
+        <span class="brand-logo" aria-hidden="true">BF</span>
+        <span class="brand-text">
+          <span class="brand-title">BuildersFrame</span>
+          <span class="brand-tagline">Student Challenge Workspace</span>
+        </span>
+      </a>
+      <a href="/" class="btn btn-outline btn-sm">← Back to Workspace</a>
+    </header>
+
+    <main class="auth-main">
+      <section class="auth-intro-col">
+        <p class="hero-eyebrow">SQLite-backed student profile</p>
+        <h1>Save your skills, stack, and hackathon plan.</h1>
+        <p>
+          Create a student builder profile or sign in to personalize challenge fit scores, starter build plans, and your problem stack across sessions.
+        </p>
+        <ul class="auth-benefits">
+          <li><strong>Profile-aware skill scoring:</strong> Overlap, adjacent stacks, team size, and hub proximity update rankings automatically.</li>
+          <li><strong>Persistent My Stack:</strong> Keep Exploring, Validating, Building, and Accomplished challenges linked to your account.</li>
+          <li><strong>Prefilled collaboration:</strong> Your name, college, and level stay synced across Community Rooms and Team Matcher.</li>
+        </ul>
+      </section>
+
+      <section class="auth-card" aria-label="Account authentication">
+        <!-- Already Signed-in State -->
+        <div id="alreadySignedInView" style="display:none;">
+          <p class="section-kicker">Active Session</p>
+          <h2 style="font-size:1.3rem; margin-bottom:0.4rem;" id="signedInUserName">Signed in</h2>
+          <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:1rem;" id="signedInUserMeta"></p>
+          <div style="display:flex; gap:0.65rem; flex-wrap:wrap;">
+            <a href="/" class="btn btn-primary">Open BuildersFrame Workspace →</a>
+            <button type="button" class="btn btn-outline" onclick="handleLogout()">Sign out</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div id="authFormsWrapper">
+          <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+            <button type="button" class="auth-tab-btn active" role="tab" aria-selected="true" data-auth-tab="login" onclick="switchAuthTab('login')">Sign In</button>
+            <button type="button" class="auth-tab-btn" role="tab" aria-selected="false" data-auth-tab="register" onclick="switchAuthTab('register')">Create Account</button>
+          </div>
+
+          <div id="authAlertBox" class="auth-alert" role="alert"></div>
+
+          <!-- Sign In Form -->
+          <form id="loginForm" onsubmit="event.preventDefault(); submitLogin();">
+            <div class="auth-field">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" class="auth-input" placeholder="you@college.edu" required autocomplete="email">
+            </div>
+            <div class="auth-field">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" class="auth-input" placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.35rem;" id="loginSubmitBtn">
+              Sign In to Workspace →
+            </button>
+
+            <div class="demo-account-box">
+              <div>
+                <strong>Sample DB Student Account:</strong><br>
+                <code>builder@kpriet.ac.in</code> / <code>builders2026</code>
+              </div>
+              <button type="button" class="btn btn-soft btn-sm" onclick="fillAndLoginDemo()">Use Sample Account</button>
+            </div>
+          </form>
+
+          <!-- Create Account Form -->
+          <form id="registerForm" style="display:none;" onsubmit="event.preventDefault(); submitRegister();">
+            <div class="auth-grid-2">
+              <div class="auth-field">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" class="auth-input" placeholder="e.g. Arun Kumar" required autocomplete="name">
+              </div>
+              <div class="auth-field">
+                <label for="regCollege">College / Institution</label>
+                <input type="text" id="regCollege" class="auth-input" placeholder="e.g. KPRIET, Coimbatore" required>
+              </div>
+            </div>
+
+            <div class="auth-grid-2">
+              <div class="auth-field">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" class="auth-input" placeholder="you@college.edu" required autocomplete="email">
+              </div>
+              <div class="auth-field">
+                <label for="regPassword">Password (min 6 chars)</label>
+                <input type="password" id="regPassword" class="auth-input" placeholder="Create password" minlength="6" required autocomplete="new-password">
+              </div>
+            </div>
+
+            <div class="auth-grid-2">
+              <div class="auth-field">
+                <label for="regLevel">Capability Level</label>
+                <select id="regLevel" class="auth-input">
+                  <option value="Beginner">Beginner (1st/2nd Yr)</option>
+                  <option value="Intermediate" selected>Intermediate (3rd/4th Yr)</option>
+                  <option value="Advanced">Advanced (Deep Tech)</option>
+                </select>
+              </div>
+              <div class="auth-field">
+                <label for="regLocation">Hub Location</label>
+                <select id="regLocation" class="auth-input">
+                  <option value="Coimbatore, Tamil Nadu" selected>Coimbatore, TN</option>
+                  <option value="Chennai, Tamil Nadu">Chennai, TN</option>
+                  <option value="Bengaluru, Karnataka">Bengaluru, KA</option>
+                  <option value="Pan-India">Pan-India</option>
+                  <option value="Global / Online">Global / Online</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label>Select Starter Skills</label>
+              <div class="skills-pill-picker" id="regSkillsPicker"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="regSubmitBtn">
+              Create Account &amp; Enter Workspace →
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const AVAILABLE_SKILLS = [
+      'Python', 'TensorFlow/PyTorch', 'OpenCV', 'React', 'React Native',
+      'Flutter', 'Node.js', 'FastAPI', 'Embedded C/ESP32', 'IoT / Sensors',
+      'PostGIS / GIS', 'Web3 / Cryptography', 'MediaPipe', 'Signal Processing',
+      'YOLOv8/v11', 'UI/UX (Figma)', 'Docker'
+    ];
+    let selectedRegSkills = ['Python', 'React', 'FastAPI'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderRegSkills();
+      checkCurrentSession();
+    });
+
+    function renderRegSkills() {
+      const box = document.getElementById('regSkillsPicker');
+      if (!box) return;
+      box.innerHTML = AVAILABLE_SKILLS.map(skill => {
+        const active = selectedRegSkills.includes(skill);
+        return `<button type="button" class="skill-selectable ${active ? 'selected' : ''}" onclick="toggleRegSkill('${skill}')">${skill}</button>`;
+      }).join('');
+    }
+
+    function toggleRegSkill(skill) {
+      const idx = selectedRegSkills.indexOf(skill);
+      if (idx >= 0) selectedRegSkills.splice(idx, 1);
+      else selectedRegSkills.push(skill);
+      renderRegSkills();
+    }
+
+    function switchAuthTab(tab) {
+      hideAlert();
+      document.querySelectorAll('.auth-tab-btn').forEach(b => {
+        const active = b.dataset.authTab === tab;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('authAlertBox');
+      box.textContent = msg;
+      box.className = `auth-alert ${type}`;
+    }
+
+    function hideAlert() {
+      const box = document.getElementById('authAlertBox');
+      box.className = 'auth-alert';
+      box.textContent = '';
+    }
+
+    async function checkCurrentSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          document.getElementById('authFormsWrapper').style.display = 'none';
+          document.getElementById('alreadySignedInView').style.display = 'block';
+          document.getElementById('signedInUserName').textContent = `Signed in as ${data.user.full_name}`;
+          document.getElementById('signedInUserMeta').textContent =
+            `${data.user.email} • ${data.user.level} • ${data.user.college || data.user.location}`;
+        }
+      } catch (e) {
+        // Stay on auth forms if session check fails
+      }
+    }
+
+    async function submitLogin() {
+      hideAlert();
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showAlert('Signed in! Redirecting to workspace...', 'success');
+          window.location.href = '/';
+        } else {
+          showAlert(data.message || 'Sign in failed');
+        }
+      } catch (err) {
+        showAlert('Network error contacting authentication server');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function fillAndLoginDemo() {
+      document.getElementById('loginEmail').value = 'builder@kpriet.ac.in';
+      document.getElementById('loginPassword').value = 'builders2026';
+      submitLogin();
+    }
+
+    async function submitRegister() {
+      hideAlert();
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: document.getElementById('regName').value,
+            college: document.getElementById('regCollege').value,
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPassword').value,
+            level: document.getElementById('regLevel').value,
+            location: document.getElementById('regLocation').value,
+            skills: selectedRegSkills
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showAlert('Account created! Redirecting to workspace...', 'success');
+          window.location.href = '/';
+        } else {
+          showAlert(data.message || 'Registration failed');
+        }
+      } catch (err) {
+        showAlert('Network error contacting authentication server');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function handleLogout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.reload();
+    }
+  </script>
+</body>
+</html>

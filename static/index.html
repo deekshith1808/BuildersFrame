@@ -3,59 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BuildersFrame — Credible Challenges & Hackathon Navigator for Students</title>
-  <meta name="description" content="Discover real-world hackathon challenges from Smart India Hackathon, judge evidence, match strengths, and move from discovery to a first build.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><text x='50%' y='68%' font-size='55' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>BF</text></svg>">
+  <title>BuildersFrame — Hackathon Challenge Discovery & Planning for Students</title>
+  <meta name="description" content="Explore sourced hackathon challenges, evaluate fit against your skills, track selected problems, and turn ideas into a focused first build plan.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2316241B'/><text x='50%' y='66%' font-size='52' font-weight='700' fill='%23FAF9EF' text-anchor='middle' font-family='sans-serif'>BF</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=20261125d">
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
 
   <!-- Top App Navigation Bar -->
   <header class="app-header">
     <div class="header-container">
-      <div class="brand-wrapper" onclick="switchView('home')">
-        <div class="brand-logo">BF</div>
-        <div class="brand-text">
-          <h1>BuildersFrame</h1>
-          <span class="brand-tagline">Student Hackathon Navigator</span>
-        </div>
-      </div>
+      <button type="button" class="brand-wrapper" onclick="switchView('home')" aria-label="BuildersFrame home">
+        <span class="brand-logo" aria-hidden="true">BF</span>
+        <span class="brand-text">
+          <span class="brand-title">BuildersFrame</span>
+          <span class="brand-tagline">Student Challenge Workspace</span>
+        </span>
+      </button>
 
-      <!-- Navigation Tabs -->
-      <nav class="main-nav" id="mainNav">
-        <div class="nav-indicator-pill" id="navIndicatorPill"></div>
-        <button class="nav-item active" data-view="home" onclick="switchView('home')">
+      <!-- Desktop Navigation Tabs -->
+      <nav class="main-nav" id="mainNav" aria-label="Primary sections">
+        <div class="nav-indicator-pill" id="navIndicatorPill" aria-hidden="true"></div>
+        <button type="button" class="nav-item active" data-view="home" onclick="switchView('home')">
           <span>Home</span>
         </button>
-        <button class="nav-item" data-view="discovery" onclick="switchView('discovery')">
-          <span>Explore Challenges</span>
+        <button type="button" class="nav-item" data-view="discovery" onclick="switchView('discovery')">
+          <span>Challenges</span>
         </button>
-        <button class="nav-item" data-view="matchmaker" onclick="switchView('matchmaker')">
-          <span>AI Matchmaker</span>
+        <button type="button" class="nav-item" data-view="matchmaker" onclick="switchView('matchmaker')">
+          <span>Matchmaker</span>
         </button>
-        <button class="nav-item" data-view="stack" onclick="switchView('stack')">
+        <button type="button" class="nav-item" data-view="stack" onclick="switchView('stack')">
           <span>My Stack</span>
           <span class="nav-badge" id="stackCountBadge">0</span>
         </button>
-        <button class="nav-item" data-view="hackathons" onclick="switchView('hackathons')">
-          <span>Hackathons Radar</span>
+        <button type="button" class="nav-item" data-view="hackathons" onclick="switchView('hackathons')">
+          <span>Hackathons</span>
         </button>
-        <button class="nav-item" data-view="community" onclick="switchView('community')">
-          <span>Community Rooms</span>
+        <button type="button" class="nav-item" data-view="community" onclick="switchView('community')">
+          <span>Community</span>
         </button>
-        <button class="nav-item" data-view="collaboration" onclick="switchView('collaboration')">
-          <span>Team Matcher</span>
+        <button type="button" class="nav-item" data-view="collaboration" onclick="switchView('collaboration')">
+          <span>Teams</span>
         </button>
       </nav>
 
-      <!-- Header Quick Actions -->
+      <!-- Header Actions & Mobile Menu Control -->
       <div class="header-actions">
-        <!-- Location Picker -->
-        <div class="location-indicator" title="Your current detected hub">
-          <span>📍</span>
+        <div class="location-indicator desktop-only-control" title="Filter nearby hackathons and recommendations">
+          <label for="userLocationSelect" class="sr-only">Hub location</label>
+          <span class="loc-pin" aria-hidden="true">Hub:</span>
           <select id="userLocationSelect" onchange="handleLocationChange(this.value)">
             <option value="Coimbatore, Tamil Nadu" selected>Coimbatore, TN</option>
             <option value="Chennai, Tamil Nadu">Chennai, TN</option>
@@ -65,492 +66,613 @@
           </select>
         </div>
 
-        <!-- Sync / Fetch Live Challenges -->
-        <button class="btn btn-outline btn-sm" onclick="openFetchModal()" title="Fetch recent problem statements from SIH & online feeds">
-          <span>🔄 Sync SIH Feed</span>
+        <button type="button" class="btn btn-outline btn-sm desktop-only-control" onclick="openFetchModal()" title="Sync curated problem catalog or load a custom JSON feed">
+          <span>Sync Catalog</span>
+        </button>
+
+        <div id="headerAuthContainer" class="desktop-only-control header-auth-container">
+          <a href="/login" class="btn btn-primary btn-sm" id="headerLoginLink">Sign In</a>
+        </div>
+
+        <button type="button" class="btn btn-outline btn-sm mobile-menu-toggle" id="mobileMenuBtn" aria-expanded="false" aria-controls="mobileNavDrawer" onclick="toggleMobileMenu()">
+          <span id="mobileMenuBtnLabel">Menu</span>
         </button>
       </div>
     </div>
+
+    <!-- Accessible Mobile / Tablet Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" hidden>
+      <div class="mobile-nav-inner">
+        <nav class="mobile-nav-links" aria-label="Mobile navigation">
+          <button type="button" class="mobile-nav-item active" data-view="home" onclick="switchViewFromMobile('home')">Home</button>
+          <button type="button" class="mobile-nav-item" data-view="discovery" onclick="switchViewFromMobile('discovery')">Explore Challenges</button>
+          <button type="button" class="mobile-nav-item" data-view="matchmaker" onclick="switchViewFromMobile('matchmaker')">Skill Matchmaker</button>
+          <button type="button" class="mobile-nav-item" data-view="stack" onclick="switchViewFromMobile('stack')">
+            <span>My Problem Stack</span>
+            <span class="nav-badge" id="mobileStackBadge">0</span>
+          </button>
+          <button type="button" class="mobile-nav-item" data-view="hackathons" onclick="switchViewFromMobile('hackathons')">Hackathons Radar</button>
+          <button type="button" class="mobile-nav-item" data-view="community" onclick="switchViewFromMobile('community')">Community Rooms</button>
+          <button type="button" class="mobile-nav-item" data-view="collaboration" onclick="switchViewFromMobile('collaboration')">Team Matcher</button>
+        </nav>
+
+        <div class="mobile-nav-utilities">
+          <div class="mobile-utility-row">
+            <label for="mobileLocationSelect">Location hub</label>
+            <select id="mobileLocationSelect" class="filter-select" onchange="syncLocationFromMobile(this.value)">
+              <option value="Coimbatore, Tamil Nadu" selected>Coimbatore, TN</option>
+              <option value="Chennai, Tamil Nadu">Chennai, TN</option>
+              <option value="Bengaluru, Karnataka">Bengaluru, KA</option>
+              <option value="Pan-India">Pan-India</option>
+              <option value="Global / Online">Global / Online</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" style="width:100%;" onclick="closeMobileMenu(); openFetchModal();">
+            Sync Challenge Catalog
+          </button>
+          <div id="mobileAuthContainer" class="mobile-auth-container">
+            <a href="/login" class="btn btn-primary btn-sm" style="width:100%; justify-content:center;" id="mobileLoginLink">Sign In / Create Builder Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-progress-bar" id="scrollProgressBar" aria-hidden="true"></div>
   </header>
 
   <!-- Main Container -->
-  <main class="app-container">
+  <main class="app-container" id="mainContent">
 
-    <!-- 0. WELCOMING HOME PAGE VIEW (Centered Search & Platform Blueprint) -->
-    <section id="homeView" class="view-section active">
+    <!-- 0. HOME PAGE VIEW (Full-Viewport Opening Moment + Editorial Story Flow) -->
+    <section id="homeView" class="view-section active" aria-label="BuildersFrame overview">
       <div class="home-page-container">
-        <!-- Center Search Hero Section -->
-        <div class="home-hero-center">
-          <!-- Interactive Particle Mesh Canvas -->
-          <canvas id="heroMeshCanvas" class="hero-mesh-canvas"></canvas>
 
-          <div class="home-badge-pill">
-            <span>⚡</span>
-            <span class="text-shimmer">BUILDERSFRAME • THE FUTURE OF STUDENT HACKATHON RESEARCH</span>
-          </div>
+        <!-- OPENING FULL-VIEWPORT HERO STAGE -->
+        <div class="hero-stage" id="homeHeroStage" data-home-section="homeHeroStage">
+          <!-- Subtle decorative alignment canvas behind hero; pauses offscreen / reduced-motion -->
+          <canvas id="heroMeshCanvas" class="hero-mesh-canvas" aria-hidden="true"></canvas>
 
-          <h2 class="home-hero-title">
-            Credible Challenges for Students.<br>
-            <span class="text-shimmer">From Problem to Verified Prototype.</span>
-          </h2>
+          <div class="hero-editorial-grid">
+            <!-- Left Column: Core Value Proposition & Direct Actions -->
+            <div class="hero-copy-col">
+              <p class="hero-eyebrow">A clearer starting point for your next hackathon</p>
 
-          <p class="home-hero-subtitle">
-            An autonomous decision and research engine built exclusively for student hackathon competitors. Sift through verified <strong>Smart India Hackathon</strong> problem statements, inspect prior failed prototype forensics, and generate validated 36-hour execution architectures.
-          </p>
+              <h1 class="home-hero-title">Find the challenge <span class="hero-accent-sweep">worth building.</span></h1>
 
-          <!-- Large Center Search Bar -->
-          <form class="home-center-search-box" onsubmit="event.preventDefault(); handleHomeCenterSearch();">
-            <div class="home-search-bar">
-              <span style="font-size:1.1rem; color:var(--text-subtle); margin-right:0.6rem;">🔍</span>
-              <input type="text" id="homeSearchInput" class="home-search-input" placeholder="Search by challenge keyword, SIH code (e.g. SIH1601), ministry, or skill..." required autocomplete="off" oninput="handleHomeSearchInput(this.value)">
-              <button type="button" id="homeSearchClearBtn" class="search-clear-btn" onclick="clearHomeSearch()" style="display:none;" title="Clear search">✕</button>
-              <kbd class="search-key-badge" title="Press '/' on keyboard to focus search">/</kbd>
-              <button type="submit" class="home-search-btn">
-                <span>Explore Challenges</span>
-                <span>➔</span>
-              </button>
-            </div>
-            <!-- Live Instant Search Suggestions -->
-            <div id="homeSearchSuggestions" class="home-search-suggestions"></div>
-          </form>
+              <p class="home-hero-subtitle">
+                Explore sourced problem statements, see how they fit your skills, and turn a promising idea into a focused first plan.
+              </p>
 
-          <!-- Trending Search Chips -->
-          <div class="home-trending-tags">
-            <span class="home-trending-label">Trending Challenges:</span>
-            <span class="home-chip" onclick="quickSearchHome('Crop Pest SIH1601')">🌾 Pest Detection (SIH1601)</span>
-            <span class="home-chip" onclick="quickSearchHome('Potholes SIH1645')">🚗 Road Potholes (SIH1645)</span>
-            <span class="home-chip" onclick="quickSearchHome('Vaccine Cold Chain SIH1710')">🩺 Vaccine Cold-Chain (SIH1710)</span>
-            <span class="home-chip" onclick="quickSearchHome('Tribal STEM SIH1912')">📚 Tribal STEM PWA (SIH1912)</span>
-            <span class="home-chip" onclick="quickSearchHome('Solar Microgrid SIH1804')">⚡ Solar Trading (SIH1804)</span>
-            <span class="home-chip" onclick="quickSearchHome('Deepfake Voice SIH1930')">🛡️ Deepfake Audio (SIH1930)</span>
-          </div>
-
-          <!-- Interactive Quick Match Finder Widget -->
-          <div class="home-interactive-finder motion-spotlight-card">
-            <div class="finder-header-row">
-              <div class="finder-title">
-                <span>⚡</span>
-                <span>Interactive Match Finder</span>
+              <div class="hero-cta-row">
+                <button type="button" class="btn btn-primary btn-lg" onclick="switchView('discovery')">
+                  <span>Explore challenges</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-lg" onclick="switchView('matchmaker')">
+                  <span>Check your skill fit</span>
+                </button>
+                <a href="#howItWorksSection" class="hero-text-link" onclick="scrollToHomeSection(event, 'howItWorksSection')">
+                  See how it works ↓
+                </a>
               </div>
-              <span class="finder-live-chip">Live 10-Second Selector</span>
+
+              <!-- Search Input inside Hero -->
+              <form class="home-center-search-box" id="homeSearchForm" onsubmit="event.preventDefault(); handleHomeCenterSearch();" role="search" aria-label="Search challenges">
+                <div class="home-search-bar">
+                  <span class="hero-search-label" aria-hidden="true">Search</span>
+                  <input type="text" id="homeSearchInput" class="home-search-input" placeholder="Code (SIH1601), keyword, or skill..." required autocomplete="off" onfocus="handleHomeSearchFocus()" onclick="handleHomeSearchFocus()" oninput="handleHomeSearchInput(this.value)" aria-label="Search problem statements by keyword, code, ministry, or skill">
+                  <button type="button" id="homeSearchClearBtn" class="search-clear-btn" onclick="clearHomeSearch()" style="display:none;" aria-label="Clear search">✕</button>
+                  <kbd class="search-key-badge" title="Press '/' to focus search">/</kbd>
+                  <button type="submit" class="home-search-btn">
+                    <span>Find</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+                <div id="homeSearchSuggestions" class="home-search-suggestions" role="listbox" aria-label="Matching challenges"></div>
+              </form>
+            </div>
+
+            <!-- Right Column: Modular BuildersFrame Visual (Problem -> Fit -> Plan) -->
+            <div class="hero-frame-col">
+              <div class="builders-frame-widget" id="buildersFrameVisual" aria-label="Interactive workflow preview">
+                <div class="frame-widget-header">
+                  <span class="frame-label-mono">Sample workflow preview</span>
+                  <div class="frame-stage-tabs" role="tablist" aria-label="BuildersFrame workflow steps">
+                    <button type="button" class="frame-tab active" role="tab" aria-selected="true" data-frame-step="problem" onclick="selectHeroFrameStep('problem')">01 Problem</button>
+                    <button type="button" class="frame-tab" role="tab" aria-selected="false" data-frame-step="fit" onclick="selectHeroFrameStep('fit')">02 Fit</button>
+                    <button type="button" class="frame-tab" role="tab" aria-selected="false" data-frame-step="plan" onclick="selectHeroFrameStep('plan')">03 Plan</button>
+                  </div>
+                </div>
+
+                <!-- Hairline schematic flow indicator -->
+                <div class="frame-schematic-bar" aria-hidden="true">
+                  <span class="schematic-node active" data-step="problem">Problem Brief</span>
+                  <span class="schematic-connector"></span>
+                  <span class="schematic-node" data-step="fit">Team Fit</span>
+                  <span class="schematic-connector"></span>
+                  <span class="schematic-node" data-step="plan">First Plan</span>
+                </div>
+
+                <!-- 3D Perspective Layered Card Frame -->
+                <div class="frame-canvas-card" id="heroFrameCard">
+                  <!-- Step 1 Panel: Sourced Problem Brief -->
+                  <div class="frame-panel active" id="framePanelProblem" role="tabpanel">
+                    <div class="frame-panel-meta">
+                      <span class="f-code-badge" id="heroFrameCode">SIH1601</span>
+                      <span class="frame-meta-note" id="heroFrameOrg">Ministry of Agriculture • Checked Nov 2026</span>
+                    </div>
+                    <h2 class="frame-panel-title" id="heroFrameTitle">Early Detection & Advisory for Crop Pest Infestations</h2>
+                    <p class="frame-panel-summary" id="heroFrameSummary">
+                      Constraint: offline on-device inference, low-cost optics under ₹800, and local-language audio prompts.
+                    </p>
+                    <div class="frame-panel-footer">
+                      <span class="frame-detail-line"><strong>Affected group:</strong> <span id="heroFrameAffected">Smallholder farmers in delta & drought districts</span></span>
+                    </div>
+                  </div>
+
+                  <!-- Step 2 Panel: Deterministic Skill Fit -->
+                  <div class="frame-panel" id="framePanelFit" role="tabpanel" hidden>
+                    <div class="frame-panel-meta">
+                      <span class="frame-score-pill">Deterministic Skill Fit</span>
+                      <span class="frame-meta-note">Weighted overlap formula</span>
+                    </div>
+                    <h2 class="frame-panel-title">See matched skills and gaps before committing</h2>
+                    <div class="frame-fit-rows" id="heroFrameFitRows">
+                      <div class="frame-fit-row ok"><span>Matched:</span> Python, OpenCV, Flutter</div>
+                      <div class="frame-fit-row gap"><span>Gap to fill:</span> Embedded C / ESP32 teammate</div>
+                      <div class="frame-fit-row note"><span>Scope check:</span> Intermediate • Hardware + Software</div>
+                    </div>
+                    <div class="frame-panel-footer">
+                      <button type="button" class="btn btn-soft btn-sm" onclick="switchView('matchmaker')">Run with your own skills →</button>
+                    </div>
+                  </div>
+
+                  <!-- Step 3 Panel: Template-Guided Build Plan -->
+                  <div class="frame-panel" id="framePanelPlan" role="tabpanel" hidden>
+                    <div class="frame-panel-meta">
+                      <span class="frame-score-pill">Suggested Starting Plan</span>
+                      <span class="frame-meta-note">Template-guided scaffold</span>
+                    </div>
+                    <h2 class="frame-panel-title">Move from problem brief to a focused first sprint</h2>
+                    <ul class="frame-plan-list">
+                      <li><span>01</span> Freeze 1 primary user flow & test offline edge inference</li>
+                      <li><span>02</span> Review 2 historical student prototype constraints</li>
+                      <li><span>03</span> Save to My Stack & export a Markdown team brief</li>
+                    </ul>
+                    <div class="frame-panel-footer">
+                      <button type="button" class="btn btn-soft btn-sm" onclick="openHeroSamplePlan()">Inspect sample plan →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Hero Section Navigation & Gentle Scroll Cue -->
+          <div class="hero-bottom-bar">
+            <nav class="hero-section-nav" id="homeSectionNav" aria-label="Home page sections">
+              <a href="#homeHeroStage" class="section-nav-link active" data-section-target="homeHeroStage" aria-current="true" onclick="scrollToHomeSection(event, 'homeHeroStage')">01 Overview</a>
+              <a href="#howItWorksSection" class="section-nav-link" data-section-target="howItWorksSection" onclick="scrollToHomeSection(event, 'howItWorksSection')">02 How it works</a>
+              <a href="#discoverSection" class="section-nav-link" data-section-target="discoverSection" onclick="scrollToHomeSection(event, 'discoverSection')">03 Discover</a>
+              <a href="#matchingSection" class="section-nav-link" data-section-target="matchingSection" onclick="scrollToHomeSection(event, 'matchingSection')">04 Match &amp; plan</a>
+              <a href="#eventsSection" class="section-nav-link" data-section-target="eventsSection" onclick="scrollToHomeSection(event, 'eventsSection')">05 Events &amp; teams</a>
+              <a href="#nextStepSection" class="section-nav-link" data-section-target="nextStepSection" onclick="scrollToHomeSection(event, 'nextStepSection')">06 Next step</a>
+            </nav>
+
+            <a href="#howItWorksSection" class="scroll-cue-btn" onclick="scrollToHomeSection(event, 'howItWorksSection')">
+              <span>Scroll to explore</span>
+              <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- SECTION 1: HOW IT WORKS -->
+        <section id="howItWorksSection" class="home-narrative-section reveal-on-scroll" data-home-section="howItWorksSection">
+          <div class="home-section-title-wrap">
+            <p class="section-kicker">Workflow</p>
+            <h2 class="home-section-title">How BuildersFrame works</h2>
+            <p class="home-section-sub">Built to take student teams from unfocused problem browsing to a scoped, realistic first prototype.</p>
+          </div>
+
+          <div class="home-pillars-grid">
+            <article class="home-pillar-card">
+              <div class="home-pillar-header">
+                <span class="home-pillar-num">01</span>
+                <span class="pillar-tag-pill">Sourced briefs</span>
+              </div>
+              <h3 class="home-pillar-title">Curated problem library</h3>
+              <p class="home-pillar-body">
+                Browse curated problem statements attributed to Smart India Hackathon, ministries, and collegiate challenges with target groups, stated constraints, and check dates.
+              </p>
+              <button type="button" class="pillar-action-link" onclick="switchView('discovery')">Browse challenges →</button>
+            </article>
+
+            <article class="home-pillar-card">
+              <div class="home-pillar-header">
+                <span class="home-pillar-num">02</span>
+                <span class="pillar-tag-pill">Context notes</span>
+              </div>
+              <h3 class="home-pillar-title">Prior attempt trade-offs</h3>
+              <p class="home-pillar-body">
+                Review curated notes on why earlier student prototypes struggled—such as cloud latency or hardware cost—before designing your own solution.
+              </p>
+              <button type="button" class="pillar-action-link" onclick="openHeroSampleDossier()">View sample dossier →</button>
+            </article>
+
+            <article class="home-pillar-card">
+              <div class="home-pillar-header">
+                <span class="home-pillar-num">03</span>
+                <span class="pillar-tag-pill">Weighted formula</span>
+              </div>
+              <h3 class="home-pillar-title">Explainable skill fit</h3>
+              <p class="home-pillar-body">
+                Score challenges deterministically against your year, skills, and domains so you see which capabilities overlap and which gaps need a teammate.
+              </p>
+              <button type="button" class="pillar-action-link" onclick="switchView('matchmaker')">Check your fit →</button>
+            </article>
+
+            <article class="home-pillar-card">
+              <div class="home-pillar-header">
+                <span class="home-pillar-num">04</span>
+                <span class="pillar-tag-pill">Starter scaffold</span>
+              </div>
+              <h3 class="home-pillar-title">Guided planning &amp; briefs</h3>
+              <p class="home-pillar-body">
+                Organize shortlisted problems in My Stack, inspect template-guided sprint checklists, and export a clean Markdown project brief for your team.
+              </p>
+              <button type="button" class="pillar-action-link" onclick="switchView('stack')">Open My Stack →</button>
+            </article>
+          </div>
+
+          <div class="home-principles-banner">
+            <div class="home-principle-item">
+              <h4>Evidence before volume</h4>
+              <p>Keep source references, check dates, and community submissions clearly labeled rather than padding the catalog with unattributed prompts.</p>
+            </div>
+            <div class="home-principle-item">
+              <h4>Explainable recommendations</h4>
+              <p>Every score shows the exact skill overlaps, difficulty weights, and hardware cautions behind the number—no black-box rankings.</p>
+            </div>
+            <div class="home-principle-item">
+              <h4>Action over endless browsing</h4>
+              <p>Move directly from picking a problem to validating assumptions, finding missing skills on the team board, and exporting a team brief.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: DISCOVER REAL CHALLENGES -->
+        <section id="discoverSection" class="home-narrative-section reveal-on-scroll" data-home-section="discoverSection">
+          <div class="home-section-title-wrap">
+            <p class="section-kicker">Challenge Discovery</p>
+            <h2 class="home-section-title">Filter the catalog in seconds</h2>
+            <p class="home-section-sub">Narrow down curated challenges by domain, complexity, and software or hardware track before opening the full directory.</p>
+          </div>
+
+          <!-- Quick Match Finder -->
+          <div class="home-interactive-finder">
+            <div class="finder-header-row">
+              <div class="finder-title">Quick Filter Builder</div>
+              <span class="finder-live-chip">Instant catalog count</span>
             </div>
 
             <div class="finder-filters-row">
-              <!-- Track 1: Domains -->
-              <div class="finder-track">
-                <span class="finder-track-label">Domain:</span>
-                <span class="finder-pill active" data-finder-type="domain" data-val="" onclick="toggleFinderPill(this)">All</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Smart Agriculture" onclick="toggleFinderPill(this)">🌾 Agriculture</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Smart Mobility & Transport" onclick="toggleFinderPill(this)">🚗 Mobility</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Healthcare & Biomedical" onclick="toggleFinderPill(this)">🩺 Health</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Renewable Energy" onclick="toggleFinderPill(this)">⚡ Energy</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Cyber Security & Defence" onclick="toggleFinderPill(this)">🛡️ Cyber</span>
-                <span class="finder-pill" data-finder-type="domain" data-val="Smart Education" onclick="toggleFinderPill(this)">📚 Education</span>
+              <div class="finder-track" role="group" aria-label="Filter by domain">
+                <span class="finder-track-label">Domain</span>
+                <button type="button" class="finder-pill active" data-finder-type="domain" data-val="" onclick="toggleFinderPill(this)">All</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Smart Agriculture" onclick="toggleFinderPill(this)">Agriculture</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Smart Mobility" onclick="toggleFinderPill(this)">Mobility</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Healthcare & Biomedical" onclick="toggleFinderPill(this)">Healthcare</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Renewable Energy" onclick="toggleFinderPill(this)">Energy</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Cyber Security & Defence" onclick="toggleFinderPill(this)">Cyber Security</button>
+                <button type="button" class="finder-pill" data-finder-type="domain" data-val="Smart Education" onclick="toggleFinderPill(this)">Education</button>
               </div>
 
-              <!-- Track 2: Difficulty & Track -->
-              <div class="finder-track">
-                <span class="finder-track-label">Level:</span>
-                <span class="finder-pill active" data-finder-type="diff" data-val="" onclick="toggleFinderPill(this)">All</span>
-                <span class="finder-pill" data-finder-type="diff" data-val="Beginner" onclick="toggleFinderPill(this)">Beginner</span>
-                <span class="finder-pill" data-finder-type="diff" data-val="Intermediate" onclick="toggleFinderPill(this)">Intermediate</span>
-                <span class="finder-pill" data-finder-type="diff" data-val="Advanced" onclick="toggleFinderPill(this)">Advanced</span>
-                <span style="color:var(--border-medium); margin:0 0.2rem;">|</span>
-                <span class="finder-pill active" data-finder-type="cat" data-val="" onclick="toggleFinderPill(this)">All Tracks</span>
-                <span class="finder-pill" data-finder-type="cat" data-val="Software" onclick="toggleFinderPill(this)">Software</span>
-                <span class="finder-pill" data-finder-type="cat" data-val="Hardware" onclick="toggleFinderPill(this)">Hardware & IoT</span>
+              <div class="finder-track" role="group" aria-label="Filter by level and track">
+                <span class="finder-track-label">Scope</span>
+                <button type="button" class="finder-pill active" data-finder-type="diff" data-val="" onclick="toggleFinderPill(this)">All levels</button>
+                <button type="button" class="finder-pill" data-finder-type="diff" data-val="Beginner" onclick="toggleFinderPill(this)">Beginner</button>
+                <button type="button" class="finder-pill" data-finder-type="diff" data-val="Intermediate" onclick="toggleFinderPill(this)">Intermediate</button>
+                <button type="button" class="finder-pill" data-finder-type="diff" data-val="Advanced" onclick="toggleFinderPill(this)">Advanced</button>
+                <span class="finder-divider" aria-hidden="true">|</span>
+                <button type="button" class="finder-pill active" data-finder-type="cat" data-val="" onclick="toggleFinderPill(this)">All tracks</button>
+                <button type="button" class="finder-pill" data-finder-type="cat" data-val="Software" onclick="toggleFinderPill(this)">Software</button>
+                <button type="button" class="finder-pill" data-finder-type="cat" data-val="Hardware" onclick="toggleFinderPill(this)">Hardware &amp; IoT</button>
               </div>
             </div>
 
             <div class="finder-bottom-bar">
               <div class="finder-match-counter">
-                <span>Matching Verified Challenges:</span>
-                <strong id="finderMatchCount">11</strong>
+                <span>Matching curated challenges:</span>
+                <strong id="finderMatchCount">—</strong>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="applyQuickFinder()" title="View these matched challenges">
-                <span>View Filtered Challenges ➔</span>
+              <button type="button" class="btn btn-primary btn-sm" onclick="applyQuickFinder()">
+                <span>View matching challenges →</span>
               </button>
             </div>
           </div>
 
-          <!-- Interactive Live Stats Strip -->
-          <div class="home-stats-strip">
-            <div class="stat-item-card tilt-card motion-spotlight-card" onclick="switchView('discovery')" title="Click to view all verified challenges">
-              <div class="stat-number" id="statNumberProblems">11</div>
-              <div class="stat-label">Verified SIH Problems</div>
-              <div class="stat-sub">Ground Evidence Audited</div>
+          <!-- Topic Chips -->
+          <div class="home-trending-tags" aria-label="Sample challenges">
+            <span class="home-trending-label">Sample statements:</span>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1601')">Crop Pest Advisory (SIH1601)</button>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1645')">Pothole Telemetry (SIH1645)</button>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1710')">Cold-Chain Logger (SIH1710)</button>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1912')">Tribal STEM PWA (SIH1912)</button>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1804')">Solar Microgrid (SIH1804)</button>
+            <button type="button" class="home-chip" onclick="quickSearchHome('SIH1930')">Voice Spoofing (SIH1930)</button>
+          </div>
+
+          <!-- Domain Jump Grid -->
+          <div class="home-domains-grid" id="homeDomainsGrid">
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Smart Agriculture')">
+              <div class="home-domain-top">
+                <h3>Smart Agriculture</h3>
+                <span class="home-domain-count" data-domain-count="Smart Agriculture">—</span>
+              </div>
+              <span class="home-domain-desc">Crop pest detection, soil &amp; offline advisory</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Smart Mobility & Transport')">
+              <div class="home-domain-top">
+                <h3>Smart Mobility</h3>
+                <span class="home-domain-count" data-domain-count="Smart Mobility">—</span>
+              </div>
+              <span class="home-domain-desc">Road surface telemetry, rail flaws, warehouse AGVs</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Healthcare & Biomedical')">
+              <div class="home-domain-top">
+                <h3>Healthcare &amp; Bio</h3>
+                <span class="home-domain-count" data-domain-count="Healthcare & Biomedical">—</span>
+              </div>
+              <span class="home-domain-desc">Cold-chain telemetry, ISL triage, EEG interfaces</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Renewable Energy')">
+              <div class="home-domain-top">
+                <h3>Renewable Energy</h3>
+                <span class="home-domain-count" data-domain-count="Renewable Energy">—</span>
+              </div>
+              <span class="home-domain-desc">Campus microgrids, solar forecasting, carbon ledgers</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Clean Water & Sanitation')">
+              <div class="home-domain-top">
+                <h3>Clean Water &amp; Grids</h3>
+                <span class="home-domain-count" data-domain-count="Clean">—</span>
+              </div>
+              <span class="home-domain-desc">Acoustic pipeline leak detection &amp; municipal grids</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Smart Education')">
+              <div class="home-domain-top">
+                <h3>Smart Education</h3>
+                <span class="home-domain-count" data-domain-count="Smart Education">—</span>
+              </div>
+              <span class="home-domain-desc">Offline-first STEM tools for low-connectivity schools</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Cyber Security & Defence')">
+              <div class="home-domain-top">
+                <h3>Cyber Security</h3>
+                <span class="home-domain-count" data-domain-count="Cyber Security & Defence">—</span>
+              </div>
+              <span class="home-domain-desc">Deepfake audio checks &amp; social-engineering defense</span>
+            </button>
+
+            <button type="button" class="home-domain-card" onclick="jumpToDomain('Disaster Management')">
+              <div class="home-domain-top">
+                <h3>Disaster Relief</h3>
+                <span class="home-domain-count" data-domain-count="Disaster Management">—</span>
+              </div>
+              <span class="home-domain-desc">Aerial flood mapping &amp; passable rescue routing</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SECTION 3: HOW MATCHING & RESEARCH HELPS -->
+        <section id="matchingSection" class="home-narrative-section reveal-on-scroll" data-home-section="matchingSection">
+          <div class="home-split-feature">
+            <div class="split-copy">
+              <p class="section-kicker">Matching &amp; Guided Planning</p>
+              <h2 class="home-section-title" style="text-align:left;">Transparent scoring and template-guided plans</h2>
+              <p class="home-section-sub" style="text-align:left; margin:0 0 1.25rem 0;">
+                Instead of opaque AI claims, BuildersFrame uses a documented weighted formula to rank challenges against your team's current skills and provides template-guided starter roadmaps you can edit and export.
+              </p>
+              <ul class="feature-checklist">
+                <li><strong>Explainable match formula:</strong> 30 baseline + up to 32 skill &amp; alias overlap + up to 20 level fit + 12 domain alignment + team/hardware/stack checks.</li>
+                <li><strong>Template-guided starter drawer:</strong> Generates domain-matched stack ideas, 5 user-interview prompts, and sprint milestones labeled clearly as starting points.</li>
+                <li><strong>One-click Markdown brief:</strong> Export selected problems from My Stack into a structured document for team alignment.</li>
+              </ul>
+              <div class="hero-cta-row" style="margin-top:1.35rem;">
+                <button type="button" class="btn btn-primary" onclick="switchView('matchmaker')">Open Skill Matchmaker</button>
+                <button type="button" class="btn btn-outline" onclick="openHeroSamplePlan()">Inspect Starter Planner</button>
+              </div>
             </div>
-            <div class="stat-item-card tilt-card motion-spotlight-card" onclick="switchView('hackathons')" title="Click to open hackathons radar">
-              <div class="stat-number" id="statNumberHackathons">8</div>
-              <div class="stat-label">Active Hackathons</div>
-              <div class="stat-sub">Live Deadlines & Radars</div>
-            </div>
-            <div class="stat-item-card tilt-card motion-spotlight-card" onclick="switchView('matchmaker')" title="Click to run AI matchmaker">
-              <div class="stat-number" id="statNumberEvidence">100%</div>
-              <div class="stat-label">Prior Art Analysis</div>
-              <div class="stat-sub">Prototype Failure Audits</div>
-            </div>
-            <div class="stat-item-card tilt-card motion-spotlight-card" onclick="openAgentResearch('sih-1601')" title="Run AI research agent">
-              <div class="stat-number" id="statNumberRoadmaps">36h</div>
-              <div class="stat-label">Execution Roadmaps</div>
-              <div class="stat-sub">BOM & Architecture Blueprints</div>
+
+            <!-- Live Backend-Backed Catalog Metrics -->
+            <div class="home-stats-grid" aria-label="Current local catalog summary">
+              <button type="button" class="stat-item-card" onclick="switchView('discovery')">
+                <div class="stat-number" id="statNumberProblems">—</div>
+                <div class="stat-label">Curated Challenges</div>
+                <div class="stat-sub">Loaded from local SQLite catalog</div>
+              </button>
+              <button type="button" class="stat-item-card" onclick="switchView('hackathons')">
+                <div class="stat-number" id="statNumberHackathons">—</div>
+                <div class="stat-label">Tracked Hackathons</div>
+                <div class="stat-sub">Official portals &amp; community listings</div>
+              </button>
+              <button type="button" class="stat-item-card" onclick="switchView('stack')">
+                <div class="stat-number" id="statNumberStack">—</div>
+                <div class="stat-label">In Your Stack</div>
+                <div class="stat-sub">Saved across 4 build stages</div>
+              </button>
+              <button type="button" class="stat-item-card" onclick="openFetchModal()">
+                <div class="stat-number stat-date" id="statCatalogChecked">—</div>
+                <div class="stat-label">Latest Record Check</div>
+                <div class="stat-sub">Most recent catalog check date</div>
+              </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- 4 Decision Pillars: How BuildersFrame Works -->
-        <div>
+        <!-- SECTION 4: HACKATHONS & TEAM TOOLS -->
+        <section id="eventsSection" class="home-narrative-section reveal-on-scroll" data-home-section="eventsSection">
           <div class="home-section-title-wrap">
-            <h3 class="home-section-title">How BuildersFrame Works</h3>
-            <p class="home-section-sub">Built around the student engineering lifecycle to prevent endless browsing and guide decisive hackathon execution.</p>
+            <p class="section-kicker">Events &amp; Collaboration</p>
+            <h2 class="home-section-title">Track deadlines and find your team</h2>
+            <p class="home-section-sub">Pair a chosen challenge with an upcoming event, read notes from student peers, or post open roles for your squad.</p>
           </div>
 
-          <div class="home-pillars-grid">
-            <div class="home-pillar-card tilt-card motion-spotlight-card" tabindex="0">
-              <div class="home-pillar-header">
-                <div class="home-pillar-num">01</div>
-                <span class="pillar-tag-pill">SIH & Ministry Feeds</span>
+          <div class="tools-trio-grid">
+            <div class="home-hackathon-callout">
+              <div class="hackathon-callout-content">
+                <div class="hackathon-callout-live-badge" id="homeEventsBadge">Loading tracked events...</div>
+                <h3>Hackathons Radar</h3>
+                <p id="homeEventsSummary">
+                  Filter collegiate hackathons by location, format, and IST registration deadlines, with check dates and stale-link reporting.
+                </p>
               </div>
-              <h4 class="home-pillar-title">Curated Ground-Truth Library</h4>
-              <div class="pillar-hover-cue">
-                <span>Hover for details</span>
-                <span class="cue-arrow">▾</span>
-              </div>
-              <div class="home-pillar-detail">
-                <p>No artificial or generic toy problems. Real challenges sourced from Smart India Hackathon, AICTE, and government ministries with verified beneficiaries and operational constraints.</p>
-              </div>
+              <button type="button" class="btn hackathon-callout-btn" onclick="switchView('hackathons')">Open Radar →</button>
             </div>
 
-            <div class="home-pillar-card tilt-card motion-spotlight-card" tabindex="0">
-              <div class="home-pillar-header">
-                <div class="home-pillar-num">02</div>
-                <span class="pillar-tag-pill">Prototype Audits</span>
-              </div>
-              <h4 class="home-pillar-title">Prior Art & Failure Analysis</h4>
-              <div class="pillar-hover-cue">
-                <span>Hover for details</span>
-                <span class="cue-arrow">▾</span>
-              </div>
-              <div class="home-pillar-detail">
-                <p>Learn what previous hackathon teams built, why their prototypes failed in the field, and where your team's unfair technological breakthrough lies.</p>
-              </div>
+            <div class="tool-summary-card">
+              <h3>Problem Community Rooms</h3>
+              <p>Read and share dataset pointers, hardware calibration tips, and scope questions organized per problem code.</p>
+              <button type="button" class="btn btn-outline btn-sm" onclick="switchView('community')">Browse Rooms →</button>
             </div>
 
-            <div class="home-pillar-card tilt-card motion-spotlight-card" tabindex="0">
-              <div class="home-pillar-header">
-                <div class="home-pillar-num">03</div>
-                <span class="pillar-tag-pill">Student Scoring</span>
-              </div>
-              <h4 class="home-pillar-title">Explainable AI Matchmaker</h4>
-              <div class="pillar-hover-cue">
-                <span>Hover for details</span>
-                <span class="cue-arrow">▾</span>
-              </div>
-              <div class="home-pillar-detail">
-                <p>Matches challenges to your student year (1st to 4th year) and technical capabilities, complete with transparent reasoning bullets and 36-hour feasibility warnings.</p>
-              </div>
-            </div>
-
-            <div class="home-pillar-card tilt-card motion-spotlight-card" tabindex="0">
-              <div class="home-pillar-header">
-                <div class="home-pillar-num">04</div>
-                <span class="pillar-tag-pill">Autonomous Co-Pilot</span>
-              </div>
-              <h4 class="home-pillar-title">AI Research & Solution Agent</h4>
-              <div class="pillar-hover-cue">
-                <span>Hover for details</span>
-                <span class="cue-arrow">▾</span>
-              </div>
-              <div class="home-pillar-detail">
-                <p>Generates an instant 36-hour hackathon execution roadmap, 5 user interview prompts, and complete hardware BOM / software architecture blueprints.</p>
-              </div>
+            <div class="tool-summary-card">
+              <h3>Teammate Collaboration Board</h3>
+              <p>Post your challenge code, target hackathon, current team size, and missing technical skills to recruit teammates.</p>
+              <button type="button" class="btn btn-outline btn-sm" onclick="switchView('collaboration')">Open Team Matcher →</button>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Core Product Principles Banner (Directly from Product Guide) - Minimal By Default -->
-        <div class="home-principles-banner">
-          <div class="home-principle-item motion-spotlight-card" tabindex="0">
-            <div class="home-principle-header">
-              <h5><span>📜</span> Evidence Before Volume</h5>
-              <span class="principle-cue">▸</span>
-            </div>
-            <div class="home-principle-detail">
-              <p>We prioritize verifiable sources, who is genuinely affected, and when data was checked over having thousands of unverified listings.</p>
-            </div>
-          </div>
-
-          <div class="home-principle-item motion-spotlight-card" tabindex="0">
-            <div class="home-principle-header">
-              <h5><span>🧠</span> Explainable Recommendations</h5>
-              <span class="principle-cue">▸</span>
-            </div>
-            <div class="home-principle-detail">
-              <p>Every match tells your team why a problem fits your skills and a target event, separating source facts from BuildersFrame editorial scoring.</p>
-            </div>
-          </div>
-
-          <div class="home-principle-item motion-spotlight-card" tabindex="0">
-            <div class="home-principle-header">
-              <h5><span>🎯</span> Action Over Browsing</h5>
-              <span class="principle-cue">▸</span>
-            </div>
-            <div class="home-principle-detail">
-              <p>Our short path moves you from discovery to choosing a problem, testing assumptions, saving a private stack, and exporting a project brief.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Explore by Real-World Domain Quick Jump - Compact Cards with Expand on Hover -->
-        <div>
-          <div class="home-section-title-wrap">
-            <h3 class="home-section-title">Explore by Problem Domain</h3>
-            <p class="home-section-sub">Jump straight to verified challenges filtered by your department and engineering track.</p>
-          </div>
-
-          <div class="home-domains-grid">
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Smart Agriculture')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">🌾</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Smart Agriculture</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Crop health, pest optics, edge AI</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Smart Mobility & Transport')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">🚗</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Smart Mobility</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Pothole telemetry, rail fracture sensors</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Healthcare & Biomedical')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">🩺</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Healthcare & Bio</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Vaccine cold-chain, triage sign language</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Renewable Energy')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">⚡</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Renewable Energy</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Solar microgrid, carbon credit trading</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Clean Water & Sanitation')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">💧</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Clean Water</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Acoustic leak detection, Jal Jeevan Mission</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Smart Education')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">📚</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Smart Education</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Offline tribal STEM PWA, gamified learning</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Cyber Security & Defence')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">🛡️</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Cyber Security</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Deepfake voice forensics, fraud PBX listeners</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-
-            <div class="home-domain-card tilt-card motion-spotlight-card" onclick="jumpToDomain('Disaster Management')">
-              <div class="home-domain-top">
-                <div class="home-domain-icon">🚨</div>
-                <div class="home-domain-title-wrap">
-                  <h5>Disaster Relief</h5>
-                  <span class="home-domain-peek">Explore ➔</span>
-                </div>
-              </div>
-              <div class="home-domain-hover-detail">
-                <span>Drone flood routing, bathymetric SOS</span>
-                <span class="home-domain-action-pill">Filter Challenges</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Upcoming Hackathons Callout - Clean Radar Bar with Live Pulse -->
-        <div class="home-hackathon-callout tilt-card motion-spotlight-card">
-          <div class="hackathon-callout-content">
-            <div class="hackathon-callout-live-badge">
-              <span class="live-dot-pulse"></span>
-              <span>Live Hackathons Radar • 8 Verified Student Events</span>
-            </div>
-            <h3>Active Collegiate Hackathons & Deadlines</h3>
-            <div class="hackathon-callout-detail">
-              <p>
-                Stay ahead with verified registration countdowns, regional eligibility, and official links for <strong>Smart India Hackathon 2026</strong>, <strong>Flipkart GRiD</strong>, <strong>Major League Hacking</strong>, and <strong>Tamil Nadu Student Innovators</strong>.
+        <!-- SECTION 5: FINAL NEXT STEP -->
+        <section id="nextStepSection" class="home-next-step reveal-on-scroll" data-home-section="nextStepSection">
+          <div class="next-step-box">
+            <div>
+              <p class="section-kicker">Next Step</p>
+              <h2 class="home-section-title" style="text-align:left; margin-bottom:0.35rem;">Pick one problem and scope your first build.</h2>
+              <p class="home-section-sub" style="text-align:left; margin:0;">
+                Start in the full challenge library or score problems against your current skills in under a minute.
               </p>
             </div>
+            <div class="hero-cta-row">
+              <button type="button" class="btn btn-primary btn-lg" onclick="switchView('discovery')">Explore challenges →</button>
+              <button type="button" class="btn btn-outline btn-lg" onclick="switchView('matchmaker')">Run skill matchmaker</button>
+            </div>
           </div>
-          <button class="btn btn-primary hackathon-callout-btn" onclick="switchView('hackathons')">
-            <span>Open Radar ➔</span>
-          </button>
-        </div>
+        </section>
+
       </div>
     </section>
 
     <!-- 1. DISCOVERY & LIBRARY VIEW (F-Pattern Layout) -->
-    <section id="discoveryView" class="view-section">
-      <!-- Clean, Subtle Hero Bar (F-Pattern Top Stem) -->
+    <section id="discoveryView" class="view-section" aria-label="Challenge library">
       <div class="clean-hero-bar">
         <div class="hero-text-col">
-          <h2>Real-World Challenges for Student Builders</h2>
+          <h2>Challenge Library</h2>
           <p>
-            Curated problem statements from <strong>Smart India Hackathon</strong>, central ministries, and civic bodies. Evaluated on ground evidence, feasibility, and prior prototype shortcomings.
+            Curated problem statements attributed to <strong>Smart India Hackathon</strong>, central ministries, and collegiate tracks. Each record separates official source references, curated feasibility notes, and historical prototype context.
           </p>
           <div class="hero-principles-strip">
-            <span><strong>✓</strong> Evidence before volume</span>
+            <span><strong>✓</strong> Source &amp; check date tracked</span>
             <span>•</span>
-            <span><strong>✓</strong> Explainable recommendations</span>
+            <span><strong>✓</strong> Explainable skill match</span>
             <span>•</span>
-            <span><strong>✓</strong> 36-hour prototype scoping</span>
+            <span><strong>✓</strong> Scope &amp; constraints listed</span>
           </div>
         </div>
         <div class="hero-cta-group">
-          <button class="btn btn-primary" onclick="switchView('matchmaker')">
-            <span>✨ AI Matchmaker</span>
-          </button>
-          <button class="btn btn-outline" onclick="switchView('hackathons')">
-            <span>📅 Hackathons Radar</span>
-          </button>
+          <button type="button" class="btn btn-primary" onclick="switchView('matchmaker')">Skill Matchmaker</button>
+          <button type="button" class="btn btn-outline" onclick="switchView('hackathons')">Hackathons Radar</button>
+          <button type="button" class="btn btn-outline" onclick="openAddProblemModal()">+ Suggest Problem</button>
         </div>
       </div>
 
-      <!-- F-Pattern Search & Horizontal Domain Strip -->
+      <!-- Search & Filters -->
       <div class="discovery-control-strip">
-        <!-- Search Input -->
         <div class="search-row" style="display:flex; align-items:center; gap:0.65rem;">
           <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="problemSearchInput" class="search-input" placeholder="Search by title, SIH code, ministry, skill, or affected group (Press '/' to focus)..." oninput="debounceFilterProblems()">
+            <span class="search-icon" aria-hidden="true">Search</span>
+            <input type="text" id="problemSearchInput" class="search-input" placeholder="Search by title, code, ministry, skill, or affected group (Press '/' to focus)..." oninput="debounceFilterProblems()" aria-label="Filter challenges by keyword">
           </div>
-          <button class="btn btn-outline btn-sm" onclick="resetFilters()">Reset</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetFilters()">Reset</button>
         </div>
 
-        <!-- Horizontal Domain Selector Pills -->
-        <div class="domain-pills-row" id="domainPillsContainer">
+        <div class="domain-pills-row" id="domainPillsContainer" role="group" aria-label="Domain filter">
           <button type="button" class="domain-pill active" data-domain="" onclick="selectDomainPill('')">All Challenges</button>
-          <button type="button" class="domain-pill" data-domain="Smart Agriculture" onclick="selectDomainPill('Smart Agriculture')">🌾 Agriculture</button>
-          <button type="button" class="domain-pill" data-domain="Smart Mobility & Transport" onclick="selectDomainPill('Smart Mobility & Transport')">🚗 Mobility & Transport</button>
-          <button type="button" class="domain-pill" data-domain="Healthcare & Biomedical" onclick="selectDomainPill('Healthcare & Biomedical')">🩺 Healthcare</button>
-          <button type="button" class="domain-pill" data-domain="Renewable Energy" onclick="selectDomainPill('Renewable Energy')">⚡ Renewable Energy</button>
-          <button type="button" class="domain-pill" data-domain="Clean Water & Sanitation" onclick="selectDomainPill('Clean Water & Sanitation')">💧 Clean Water</button>
-          <button type="button" class="domain-pill" data-domain="Smart Education" onclick="selectDomainPill('Smart Education')">📚 Education</button>
-          <button type="button" class="domain-pill" data-domain="Cyber Security & Defence" onclick="selectDomainPill('Cyber Security & Defence')">🛡️ Cyber Security</button>
-          <button type="button" class="domain-pill" data-domain="Disaster Management" onclick="selectDomainPill('Disaster Management')">🚨 Disaster Rescue</button>
+          <button type="button" class="domain-pill" data-domain="Smart Agriculture" onclick="selectDomainPill('Smart Agriculture')">Agriculture</button>
+          <button type="button" class="domain-pill" data-domain="Smart Mobility & Transport" onclick="selectDomainPill('Smart Mobility & Transport')">Mobility &amp; Transport</button>
+          <button type="button" class="domain-pill" data-domain="Healthcare & Biomedical" onclick="selectDomainPill('Healthcare & Biomedical')">Healthcare</button>
+          <button type="button" class="domain-pill" data-domain="Renewable Energy" onclick="selectDomainPill('Renewable Energy')">Renewable Energy</button>
+          <button type="button" class="domain-pill" data-domain="Clean Water & Sanitation" onclick="selectDomainPill('Clean Water & Sanitation')">Clean Water &amp; Grids</button>
+          <button type="button" class="domain-pill" data-domain="Smart Education" onclick="selectDomainPill('Smart Education')">Education</button>
+          <button type="button" class="domain-pill" data-domain="Cyber Security & Defence" onclick="selectDomainPill('Cyber Security & Defence')">Cyber Security</button>
+          <button type="button" class="domain-pill" data-domain="Disaster Management" onclick="selectDomainPill('Disaster Management')">Disaster Relief</button>
         </div>
 
-        <!-- Secondary Filters & Layout Switcher -->
         <div class="secondary-filters-row">
           <div class="filters-sub-group">
-            <select id="categoryFilter" class="filter-select" onchange="applyFilters()">
-              <option value="">Software & Hardware</option>
+            <select id="categoryFilter" class="filter-select" onchange="applyFilters()" aria-label="Filter by category">
+              <option value="">Software &amp; Hardware</option>
               <option value="Software">Software Only</option>
               <option value="Hardware">Hardware / Embedded</option>
               <option value="Both">Both (Software + IoT)</option>
             </select>
 
-            <select id="difficultyFilter" class="filter-select" onchange="applyFilters()">
+            <select id="difficultyFilter" class="filter-select" onchange="applyFilters()" aria-label="Filter by difficulty">
               <option value="">All Difficulty Levels</option>
               <option value="Beginner">Beginner (1st/2nd Yr)</option>
               <option value="Intermediate">Intermediate (3rd/4th Yr)</option>
               <option value="Advanced">Advanced (Deep Tech)</option>
             </select>
 
-            <select id="evidenceFilter" class="filter-select" onchange="applyFilters()">
-              <option value="">All Evidence Strengths</option>
-              <option value="High">High Evidence Only</option>
+            <select id="evidenceFilter" class="filter-select" onchange="applyFilters()" aria-label="Filter by evidence strength">
+              <option value="">All Evidence Levels</option>
+              <option value="High">High Evidence</option>
               <option value="Medium">Medium Evidence</option>
             </select>
           </div>
 
-          <div style="display:flex; align-items:center; gap:0.85rem;">
-            <span id="resultsCount" style="font-size:0.78rem; color:var(--text-subtle);">Loading verified challenges...</span>
+          <div style="display:flex; align-items:center; gap:0.85rem; flex-wrap:wrap;">
+            <span id="resultsCount" style="font-size:0.78rem; color:var(--text-subtle);">Loading challenges...</span>
 
-            <!-- F-Pattern Stream vs Grid View Toggle -->
-            <div class="view-layout-toggle">
-              <button type="button" id="streamLayoutBtn" class="layout-btn active" onclick="setLayoutMode('stream')" title="F-Pattern Reading Stream">
-                <span>☰ Stream</span>
-              </button>
-              <button type="button" id="gridLayoutBtn" class="layout-btn" onclick="setLayoutMode('grid')" title="Card Grid">
-                <span>☷ Grid</span>
-              </button>
+            <div class="view-layout-toggle" role="group" aria-label="Layout mode">
+              <button type="button" id="streamLayoutBtn" class="layout-btn active" onclick="setLayoutMode('stream')" title="Stream layout">Stream</button>
+              <button type="button" id="gridLayoutBtn" class="layout-btn" onclick="setLayoutMode('grid')" title="Grid layout">Grid</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- F-Pattern Problem Stream Container -->
-      <div id="problemsStream" class="problems-stream">
-        <!-- Rendered dynamically -->
-      </div>
+      <div id="problemsStream" class="problems-stream"></div>
     </section>
 
-    <!-- 2. AI PERSONALIZATION MATCHMAKER VIEW -->
-    <section id="matchmakerView" class="view-section">
+    <!-- 2. EXPLAINABLE SKILL MATCHMAKER VIEW -->
+    <section id="matchmakerView" class="view-section" aria-label="Skill matchmaker">
       <div class="matchmaker-container">
-        <!-- Left: Student Profile Wizard -->
         <div class="profile-wizard-card">
-          <h3 class="wizard-title">AI Matchmaker</h3>
-          <p class="wizard-sub">Personalize challenge recommendations based on your technical skill and student year.</p>
+          <div class="wizard-top-header">
+            <div>
+              <h2 class="wizard-title">Skill Matchmaker</h2>
+              <p class="wizard-sub">Score challenges using your capability level, skills, stack, and hub proximity.</p>
+            </div>
+          </div>
+
+          <div id="matchProfileSyncBanner" class="match-profile-sync-banner">
+            <span>Sign in to save your builder profile &amp; stack automatically across sessions.</span>
+            <a href="/login" class="inline-auth-link">Sign in →</a>
+          </div>
+
+          <button type="button" class="btn btn-primary match-top-cta" id="matchRunBtnTop" onclick="runPersonalizationMatching()">
+            <span>Calculate Skill Fit</span>
+            <span aria-hidden="true">→</span>
+          </button>
 
           <form id="profileForm" onsubmit="event.preventDefault(); runPersonalizationMatching();">
-            <!-- Student Level -->
             <div class="wizard-group">
               <label>Your Capability Level</label>
               <div class="level-toggle-group">
@@ -560,215 +682,193 @@
               </div>
             </div>
 
-            <!-- Skills Picker -->
             <div class="wizard-group">
-              <label>Your Core Skills & Knowledge</label>
-              <p style="font-size:0.75rem; color:var(--text-subtle); margin-bottom:0.35rem;">Click to toggle your proficiencies:</p>
-              <div class="skills-pill-picker" id="skillsPicker">
-                <!-- Injected dynamically -->
-              </div>
+              <label>Your Core Skills &amp; Knowledge</label>
+              <p style="font-size:0.75rem; color:var(--text-subtle); margin-bottom:0.35rem;">Select skills your team already has:</p>
+              <div class="skills-pill-picker" id="skillsPicker"></div>
             </div>
 
-            <!-- Target Domain Passions -->
             <div class="wizard-group">
-              <label>Primary Domain Passions</label>
+              <label>Target Domains</label>
               <div style="display:flex; flex-direction:column; gap:0.35rem; font-size:0.8rem;" id="domainCheckboxGroup">
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
                   <input type="checkbox" name="domain" value="Smart Agriculture" checked> Smart Agriculture
                 </label>
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
-                  <input type="checkbox" name="domain" value="Smart Mobility & Transport" checked> Smart Mobility & Transport
+                  <input type="checkbox" name="domain" value="Smart Mobility & Transport" checked> Smart Mobility &amp; Transport
                 </label>
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
-                  <input type="checkbox" name="domain" value="Healthcare & Biomedical" checked> Healthcare & Biomedical
+                  <input type="checkbox" name="domain" value="Healthcare & Biomedical" checked> Healthcare &amp; Biomedical
                 </label>
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
-                  <input type="checkbox" name="domain" value="Renewable Energy"> Renewable Energy & Clean Tech
+                  <input type="checkbox" name="domain" value="Renewable Energy"> Renewable Energy &amp; Clean Tech
                 </label>
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
-                  <input type="checkbox" name="domain" value="Smart Education"> Smart Education & Civic Inclusion
+                  <input type="checkbox" name="domain" value="Smart Education"> Smart Education &amp; Civic Inclusion
                 </label>
                 <label style="font-weight:normal; display:flex; align-items:center; gap:0.4rem;">
-                  <input type="checkbox" name="domain" value="Cyber Security & Defence"> Cyber Security & AI Forensics
+                  <input type="checkbox" name="domain" value="Cyber Security & Defence"> Cyber Security &amp; Forensics
                 </label>
               </div>
             </div>
 
-            <!-- Team Size & Location -->
             <div class="wizard-group">
-              <label>Current Team Size</label>
+              <label for="teamSizeSelect">Current Team Size</label>
               <select id="teamSizeSelect" class="filter-select" style="width:100%;">
                 <option value="1">Solo builder (looking for teammates)</option>
                 <option value="2">Team of 2 members</option>
                 <option value="4" selected>Team of 4 members</option>
-                <option value="6">Full team of 6 (SIH Squad)</option>
+                <option value="6">Team of 6 (SIH Squad)</option>
               </select>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem;" id="matchRunBtn">
-              <span>⚡ Generate Personalized Matches</span>
+              <span>Calculate Skill Fit</span>
             </button>
           </form>
         </div>
 
-        <!-- Right: Ranked Match Results -->
         <div class="match-results-panel">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
             <div>
-              <h2 style="font-size:1.3rem; font-weight:700;">Ranked Recommendations</h2>
-              <p style="font-size:0.85rem; color:var(--text-subtle);">Algorithm-scored on skill overlap, hackathon timeline feasibility, and location synergy.</p>
+              <h2 style="font-size:1.3rem; font-weight:700;">Explainable Match Results</h2>
+              <p style="font-size:0.85rem; color:var(--text-subtle);">Clean ranked overview by Fit Index. Click Preview Details on any challenge to inspect score breakdown, affected group, and constraints.</p>
             </div>
-            <span class="principle-tag" id="matchAlgoTag">BuildersFrame Matching Algorithm v2.1</span>
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <span class="principle-tag" id="matchAlgoTag">Profile Scoring v2.2</span>
+              <button type="button" class="btn btn-primary btn-sm" id="matchRunBtnResultsTop" onclick="runPersonalizationMatching()">
+                <span>Recalculate Fit</span>
+              </button>
+            </div>
           </div>
 
-          <div id="rankedProblemsList">
-            <!-- Injected dynamically -->
-          </div>
+          <div id="rankedProblemsList"></div>
         </div>
       </div>
     </section>
 
     <!-- 3. MY PROBLEM STACK VIEW (KANBAN) -->
-    <section id="stackView" class="view-section">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+    <section id="stackView" class="view-section" aria-label="My problem stack">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
         <div>
           <h2 style="font-size:1.4rem; font-weight:700;">My Problem Stack</h2>
           <p style="font-size:0.88rem; color:var(--text-subtle);">
-            Track your lifecycle from initial challenge exploration to validated prototype. As defined in the BuildersFrame guide.
+            Track shortlisted challenges from exploration and assumption validation to an exported team brief.
           </p>
         </div>
         <div style="display:flex; gap:0.75rem;">
-          <button class="btn btn-outline btn-sm" onclick="switchView('discovery')">
-            <span>+ Add More Challenges</span>
-          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="switchView('discovery')">+ Browse Challenges</button>
         </div>
       </div>
 
-      <!-- Kanban Columns: Exploring -> Validating -> Building -> Accomplished -->
-      <div class="stack-kanban-board">
-        <!-- Col 1: Exploring -->
+      <div class="stack-stage-filter-bar" id="stackStageFilterBar" role="group" aria-label="Filter stack stages">
+        <button type="button" class="domain-pill active" data-stack-filter="all" onclick="setStackStageFilter('all')">All Stages</button>
+        <button type="button" class="domain-pill" data-stack-filter="exploring" onclick="setStackStageFilter('exploring')">1. Exploring (<span id="pillCountExploring">0</span>)</button>
+        <button type="button" class="domain-pill" data-stack-filter="validating" onclick="setStackStageFilter('validating')">2. Validating (<span id="pillCountValidating">0</span>)</button>
+        <button type="button" class="domain-pill" data-stack-filter="building" onclick="setStackStageFilter('building')">3. Building (<span id="pillCountBuilding">0</span>)</button>
+        <button type="button" class="domain-pill" data-stack-filter="accomplished" onclick="setStackStageFilter('accomplished')">4. Accomplished (<span id="pillCountAccomplished">0</span>)</button>
+      </div>
+
+      <div class="stack-kanban-board" id="stackKanbanBoard">
         <div class="kanban-col" id="colExploring">
           <div class="kanban-col-header exploring">
             <span class="col-title">1. Exploring</span>
             <span class="col-count" id="countExploring">0</span>
           </div>
-          <div class="kanban-col-body" id="cardsExploring">
-            <!-- Cards rendered here -->
-          </div>
+          <div class="kanban-col-body" id="cardsExploring"></div>
         </div>
 
-        <!-- Col 2: Validating -->
         <div class="kanban-col" id="colValidating">
           <div class="kanban-col-header validating">
             <span class="col-title">2. Validating</span>
             <span class="col-count" id="countValidating">0</span>
           </div>
-          <div class="kanban-col-body" id="cardsValidating">
-            <!-- Cards rendered here -->
-          </div>
+          <div class="kanban-col-body" id="cardsValidating"></div>
         </div>
 
-        <!-- Col 3: Building -->
         <div class="kanban-col" id="colBuilding">
           <div class="kanban-col-header building">
             <span class="col-title">3. Building</span>
             <span class="col-count" id="countBuilding">0</span>
           </div>
-          <div class="kanban-col-body" id="cardsBuilding">
-            <!-- Cards rendered here -->
-          </div>
+          <div class="kanban-col-body" id="cardsBuilding"></div>
         </div>
 
-        <!-- Col 4: Accomplished -->
         <div class="kanban-col" id="colAccomplished">
           <div class="kanban-col-header accomplished">
             <span class="col-title">4. Accomplished</span>
             <span class="col-count" id="countAccomplished">0</span>
           </div>
-          <div class="kanban-col-body" id="cardsAccomplished">
-            <!-- Cards rendered here -->
-          </div>
+          <div class="kanban-col-body" id="cardsAccomplished"></div>
         </div>
       </div>
     </section>
 
     <!-- 4. HACKATHONS RADAR VIEW -->
-    <section id="hackathonsView" class="view-section">
+    <section id="hackathonsView" class="view-section" aria-label="Hackathons radar">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
         <div>
-          <h2 style="font-size:1.4rem; font-weight:700;">Hackathons & Events Radar</h2>
+          <h2 style="font-size:1.4rem; font-weight:700;">Hackathons &amp; Events Radar</h2>
           <p style="font-size:0.88rem; color:var(--text-subtle);">
-            Verified student hackathons filtered by proximity to <span id="currentHubDisplay" style="font-weight:700; color:var(--text-main);">Coimbatore, Tamil Nadu</span>.
+            Collegiate and national events prioritized near <span id="currentHubDisplay" style="font-weight:700; color:var(--text-main);">Coimbatore, Tamil Nadu</span>. All deadlines are checked in IST unless noted otherwise.
           </p>
         </div>
 
         <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-          <select id="hackathonRegionFilter" class="filter-select" onchange="renderHackathons()">
+          <select id="hackathonRegionFilter" class="filter-select" onchange="renderHackathons()" aria-label="Filter by region">
             <option value="All">All Regions</option>
             <option value="Tamil Nadu">Tamil Nadu Only</option>
             <option value="South India">South India</option>
             <option value="National">National (Pan-India)</option>
             <option value="Global">Global / Online</option>
           </select>
-          <select id="hackathonFormatFilter" class="filter-select" onchange="renderHackathons()">
+          <select id="hackathonFormatFilter" class="filter-select" onchange="renderHackathons()" aria-label="Filter by format">
             <option value="">All Formats</option>
             <option value="In-person">In-person</option>
             <option value="Online">Online</option>
             <option value="Hybrid">Hybrid</option>
           </select>
-          <button class="btn btn-primary btn-sm" onclick="openModal('addHackathonModal')">
-            <span>+ Suggest Hackathon</span>
-          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="openModal('addHackathonModal')">+ Suggest Hackathon</button>
         </div>
       </div>
 
-      <!-- Hackathons Grid -->
-      <div id="hackathonsGrid" class="hackathons-radar-grid">
-        <!-- Injected dynamically -->
-      </div>
+      <div id="hackathonsGrid" class="hackathons-radar-grid"></div>
     </section>
 
     <!-- 5. COMMUNITY ROOMS VIEW -->
-    <section id="communityView" class="view-section">
+    <section id="communityView" class="view-section" aria-label="Community rooms">
       <div style="margin-bottom:1.25rem;">
         <h2 style="font-size:1.4rem; font-weight:700;">Problem Community Rooms</h2>
         <p style="font-size:0.88rem; color:var(--text-subtle);">
-          Dedicated student discussion room for each problem statement. Ask questions, verify sensor setups, share open datasets, and debate architectures.
+          Per-problem student notes, dataset leads, and architecture questions stored in the local database.
         </p>
       </div>
 
       <div class="community-layout">
-        <!-- Room Selector Sidebar -->
-        <div class="community-sidebar" id="communityRoomsList">
-          <!-- Rendered dynamically -->
-        </div>
+        <div class="community-sidebar" id="communityRoomsList"></div>
 
-        <!-- Chat / Discussion Stream -->
         <div class="community-chat-area">
           <div class="chat-header">
             <div>
               <h3 id="activeRoomTitle" style="font-size:1rem; font-weight:700;">Select a problem room</h3>
-              <span id="activeRoomCode" style="font-size:0.75rem; color:var(--text-subtle);">SIH Discussion Room</span>
+              <span id="activeRoomCode" style="font-size:0.75rem; color:var(--text-subtle);">Problem Discussion Room</span>
             </div>
             <div style="display:flex; gap:0.5rem;">
-              <button class="btn btn-outline btn-sm" onclick="filterRoomMessages('verified')">Verified Hints Only</button>
-              <button class="btn btn-outline btn-sm" onclick="filterRoomMessages('all')">All Messages</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="filterRoomMessages('verified')">Highlighted Hints</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="filterRoomMessages('all')">All Messages</button>
             </div>
           </div>
 
-          <div class="chat-messages-stream" id="chatMessagesStream">
-            <!-- Messages rendered dynamically -->
-          </div>
+          <div class="chat-messages-stream" id="chatMessagesStream"></div>
 
-          <!-- Chat Input -->
           <form class="chat-input-bar" onsubmit="event.preventDefault(); postCommunityMessage();">
-            <select id="newMsgType" class="filter-select" style="max-width:130px;">
+            <select id="newMsgType" class="filter-select" style="max-width:140px;" aria-label="Message type">
               <option value="question">Question</option>
               <option value="solution_hint" selected>Solution Hint</option>
               <option value="resource">Dataset / Link</option>
               <option value="discussion">Discussion</option>
             </select>
-            <input type="text" id="newMsgContent" class="search-input" placeholder="Share a dataset, ask a question, or post a verified architecture hint..." style="padding-left:1rem;" required>
+            <input type="text" id="newMsgContent" class="search-input" placeholder="Share a dataset lead, hardware note, or scope question..." style="padding-left:0.9rem;" required aria-label="New message">
             <button type="submit" class="btn btn-primary btn-sm">Post</button>
           </form>
         </div>
@@ -776,223 +876,214 @@
     </section>
 
     <!-- 6. TEAM COLLABORATION MATCHER VIEW -->
-    <section id="collaborationView" class="view-section">
+    <section id="collaborationView" class="view-section" aria-label="Team collaboration board">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <h2 style="font-size:1.4rem; font-weight:700;">Teammate Collaboration Board</h2>
           <p style="font-size:0.88rem; color:var(--text-subtle);">
-            Match with peers targeting the same problem statement, SIH tracks, or collegiate hackathons with complementary skills.
+            Connect with student teams targeting specific problem codes and seeking complementary skills.
           </p>
         </div>
-        <button class="btn btn-primary" onclick="openCreateTeamModal()">
-          <span>+ Post Team Opening</span>
-        </button>
+        <button type="button" class="btn btn-primary" onclick="openCreateTeamModal()">+ Post Team Opening</button>
       </div>
 
-      <div class="collab-grid" id="collabGrid">
-        <!-- Rendered dynamically -->
-      </div>
+      <div class="collab-grid" id="collabGrid"></div>
     </section>
 
   </main>
 
-  <!-- SLIDE-OVER DRAWER: AI RESEARCH AGENT (BuildersAgent) -->
+  <!-- SLIDE-OVER DRAWER: TEMPLATE-GUIDED RESEARCH & PLANNING ASSISTANT -->
   <div class="drawer-overlay" id="agentDrawerOverlay" onclick="closeAgentDrawer()"></div>
-  <aside class="drawer-panel" id="agentDrawerPanel">
+  <aside class="drawer-panel" id="agentDrawerPanel" aria-label="Guided research planner">
     <div class="drawer-header">
       <div>
         <div style="display:flex; align-items:center; gap:0.5rem;">
-          <span style="font-size:1.1rem;">⚡</span>
-          <h3 style="font-size:1.05rem; font-weight:700;">BuildersAgent — AI Research & Solution Architect</h3>
+          <h3 style="font-size:1.02rem; font-weight:700;">Guided Research &amp; Build Planner</h3>
+          <span class="pill-tag-muted">Template-Guided</span>
         </div>
-        <span style="font-size:0.75rem; color:#94a3b8;" id="agentDrawerProblemCode">Problem Analysis</span>
+        <span style="font-size:0.75rem; color:var(--text-subtle);" id="agentDrawerProblemCode">Problem Analysis</span>
       </div>
-      <button class="close-btn" style="color:#fff;" onclick="closeAgentDrawer()">✕</button>
+      <button type="button" class="close-btn" onclick="closeAgentDrawer()" aria-label="Close research drawer">✕</button>
     </div>
 
     <div class="drawer-body" id="agentDrawerContent">
       <div style="text-align:center; padding:3rem 1rem; color:var(--text-subtle);">
-        <p>Loading deep research dossier & 36h solution architecture...</p>
+        <p>Loading template-guided starter blueprint...</p>
       </div>
     </div>
 
-    <!-- Agent Interactive Chat Bar at bottom of drawer -->
     <div style="padding:1rem 1.25rem; border-top:1px solid var(--border-subtle); background:var(--bg-surface-subtle);">
       <p style="font-size:0.75rem; color:var(--text-subtle); margin-bottom:0.4rem;">
-        Ask BuildersAgent: request SQL schemas, practice judge defense answers, or ask for code snippets:
+        Ask the template guide (supports starter SQL schemas, pitch outlines, and dataset ideas):
       </p>
       <form style="display:flex; gap:0.5rem;" onsubmit="event.preventDefault(); sendAgentChatMessage();">
-        <input type="text" id="agentChatInput" class="search-input" placeholder="e.g. 'Give me the database schema' or 'How to pitch this to judges?'" style="padding-left:1rem; font-size:0.85rem;" required>
+        <input type="text" id="agentChatInput" class="search-input" placeholder="e.g. 'Suggest a database schema' or 'Give a pitch outline'" style="padding-left:0.9rem; font-size:0.85rem;" required aria-label="Ask guided planner">
         <button type="submit" class="btn btn-primary btn-sm">Ask</button>
       </form>
     </div>
   </aside>
 
   <!-- MODAL: PROBLEM DOSSIER & PRIOR ART -->
-  <div class="modal-overlay" id="dossierModal">
+  <div class="modal-overlay" id="dossierModal" role="dialog" aria-modal="true" aria-labelledby="modalDossierTitle">
     <div class="modal-sheet">
       <div class="modal-header">
         <div>
           <span class="problem-code-badge" id="modalDossierCode">SIH0000</span>
-          <h3 style="font-size:1.2rem; font-weight:700; margin-top:0.3rem;" id="modalDossierTitle">Problem Title</h3>
+          <h3 style="font-size:1.18rem; font-weight:700; margin-top:0.35rem;" id="modalDossierTitle">Problem Title</h3>
         </div>
-        <button class="close-btn" onclick="closeModal('dossierModal')">✕</button>
+        <button type="button" class="close-btn" onclick="closeModal('dossierModal')" aria-label="Close modal">✕</button>
       </div>
-      <div class="modal-body prose" id="modalDossierBody">
-        <!-- Rendered dynamically -->
-      </div>
+      <div class="modal-body prose" id="modalDossierBody"></div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal('dossierModal')">Close</button>
-        <button class="btn btn-soft" id="modalOpenCommunityBtn">Open Community Room</button>
-        <button class="btn btn-primary" id="modalAddToStackBtn">+ Add to Stack</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('dossierModal')">Close</button>
+        <button type="button" class="btn btn-outline" id="modalOpenCommunityBtn">Community Room</button>
+        <button type="button" class="btn btn-soft" id="modalStarterPlanBtn">Starter Plan</button>
+        <button type="button" class="btn btn-primary" id="modalAddToStackBtn">+ Save to Stack</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: PROJECT BRIEF GENERATOR & EXPORT -->
-  <div class="modal-overlay" id="briefModal">
+  <div class="modal-overlay" id="briefModal" role="dialog" aria-modal="true" aria-labelledby="briefModalTitle">
     <div class="modal-sheet">
       <div class="modal-header">
         <div>
-          <h3 style="font-size:1.2rem; font-weight:700;">Project Brief Generator</h3>
-          <p style="font-size:0.8rem; color:var(--text-subtle);">Exportable blueprint aligned with the BuildersFrame Product Guide</p>
+          <h3 id="briefModalTitle" style="font-size:1.18rem; font-weight:700;">Project Brief Exporter</h3>
+          <p style="font-size:0.8rem; color:var(--text-subtle);">Structured Markdown starter brief separating problem sources and draft assumptions</p>
         </div>
-        <button class="close-btn" onclick="closeModal('briefModal')">✕</button>
+        <button type="button" class="close-btn" onclick="closeModal('briefModal')" aria-label="Close modal">✕</button>
       </div>
       <div class="modal-body">
-        <div id="briefContentArea" class="prose">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="briefContentArea" class="prose"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal('briefModal')">Close</button>
-        <button class="btn btn-primary" onclick="downloadProjectBrief()">📥 Download Markdown Brief</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('briefModal')">Close</button>
+        <button type="button" class="btn btn-primary" onclick="downloadProjectBrief()">Download Markdown Brief</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: POST TEAM COLLABORATION OPENING -->
-  <div class="modal-overlay" id="teamModal">
+  <div class="modal-overlay" id="teamModal" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle">
     <div class="modal-sheet" style="max-width:580px;">
       <div class="modal-header">
-        <h3 style="font-size:1.15rem; font-weight:700;">Post Team Collaboration Opening</h3>
-        <button class="close-btn" onclick="closeModal('teamModal')">✕</button>
+        <h3 id="teamModalTitle" style="font-size:1.15rem; font-weight:700;">Post Team Collaboration Opening</h3>
+        <button type="button" class="close-btn" onclick="closeModal('teamModal')" aria-label="Close modal">✕</button>
       </div>
       <form id="teamPostForm" onsubmit="event.preventDefault(); submitTeamPosting();">
         <div class="modal-body">
           <div class="wizard-group">
-            <label>Team Name</label>
-            <input type="text" id="postTeamName" class="search-input" placeholder="e.g. AgriPulse Hackers" required>
+            <label for="postTeamName">Team Name</label>
+            <input type="text" id="postTeamName" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. AgriPulse Builders" required>
           </div>
           <div class="wizard-group">
-            <label>Team Lead Name & College</label>
+            <label>Team Lead Name &amp; College</label>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-              <input type="text" id="postLeadName" class="search-input" placeholder="Your Name" required>
-              <input type="text" id="postLeadCollege" class="search-input" placeholder="College (e.g. KPRIET)" required>
+              <input type="text" id="postLeadName" class="search-input" style="padding-left:0.85rem;" placeholder="Your Name" required>
+              <input type="text" id="postLeadCollege" class="search-input" style="padding-left:0.85rem;" placeholder="College (e.g. KPRIET)" required>
             </div>
           </div>
           <div class="wizard-group">
-            <label>Associated Problem Statement</label>
+            <label for="postProblemSelect">Associated Problem Statement</label>
             <select id="postProblemSelect" class="filter-select" style="width:100%;"></select>
           </div>
           <div class="wizard-group">
-            <label>Target Hackathon</label>
+            <label for="postHackathonSelect">Target Hackathon</label>
             <select id="postHackathonSelect" class="filter-select" style="width:100%;"></select>
           </div>
           <div class="wizard-group">
-            <label>Skills You Are Looking For (comma-separated)</label>
-            <input type="text" id="postSkillsNeeded" class="search-input" placeholder="e.g. Flutter Dev, Embedded C, UI/UX Designer, Female member (SIH rule)" required>
+            <label for="postSkillsNeeded">Skills Needed (comma-separated)</label>
+            <input type="text" id="postSkillsNeeded" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. Flutter, Embedded C, UI/UX" required>
           </div>
           <div class="wizard-group">
             <label>Team Size Status</label>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-              <input type="number" id="postCurrentMembers" class="search-input" min="1" max="6" value="3" placeholder="Current members">
-              <input type="number" id="postMaxMembers" class="search-input" min="2" max="6" value="6" placeholder="Total target">
+              <input type="number" id="postCurrentMembers" class="search-input" style="padding-left:0.85rem;" min="1" max="6" value="3" placeholder="Current">
+              <input type="number" id="postMaxMembers" class="search-input" style="padding-left:0.85rem;" min="2" max="6" value="6" placeholder="Target max">
             </div>
           </div>
           <div class="wizard-group">
-            <label>Short Pitch / What has your team already built?</label>
-            <textarea id="postDescription" class="search-input" rows="3" placeholder="We have the sensor circuit ready and need an app developer..." required></textarea>
+            <label for="postDescription">What has your team built so far?</label>
+            <textarea id="postDescription" class="search-input" style="padding-left:0.85rem;" rows="3" placeholder="Describe current progress and needed contributions..." required></textarea>
           </div>
           <div class="wizard-group">
-            <label>Contact Handle / Email / WhatsApp</label>
-            <input type="text" id="postContactHandle" class="search-input" placeholder="teamlead@kpriet.ac.in or +91 9876543210" required>
+            <label for="postContactHandle">Contact Handle / Email</label>
+            <input type="text" id="postContactHandle" class="search-input" style="padding-left:0.85rem;" placeholder="teamlead@college.edu" required>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('teamModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Publish Team Opening</button>
+          <button type="submit" class="btn btn-primary">Publish Opening</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: LIVE PROBLEM HARVESTER & FETCHER CONSOLE -->
-  <div class="modal-overlay" id="fetchModal">
+  <!-- MODAL: CATALOG SYNC & FEED IMPORTER -->
+  <div class="modal-overlay" id="fetchModal" role="dialog" aria-modal="true" aria-labelledby="fetchModalTitle">
     <div class="modal-sheet" style="max-width:620px;">
       <div class="modal-header">
-        <h3 style="font-size:1.15rem; font-weight:700;">Live Challenge Ingestion Console</h3>
-        <button class="close-btn" onclick="closeModal('fetchModal')">✕</button>
+        <h3 id="fetchModalTitle" style="font-size:1.15rem; font-weight:700;">Catalog Sync &amp; Feed Importer</h3>
+        <button type="button" class="close-btn" onclick="closeModal('fetchModal')" aria-label="Close modal">✕</button>
       </div>
       <div class="modal-body">
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-          Fetch freshly announced problem statements directly from Smart India Hackathon portals, AICTE innovation repositories, or custom JSON feeds with duplicate filtering.
+          Import additional challenges from a custom JSON feed URL, or load the bundled curated sample catalog with duplicate checking. No external portal is scraped without an explicit JSON endpoint.
         </p>
 
         <div class="wizard-group">
-          <label>Select Ingestion Source</label>
+          <label for="fetchSourceSelect">Source Label</label>
           <select id="fetchSourceSelect" class="filter-select" style="width:100%;">
-            <option value="Smart India Hackathon Live Portal">Smart India Hackathon Live Portal (sih.gov.in)</option>
-            <option value="AICTE National Innovation Repository">AICTE National Innovation Repository</option>
-            <option value="Devpost Student Challenge Feeds">Devpost Student Challenge Feeds</option>
+            <option value="Curated Sample Catalog">Bundled Curated Sample Catalog (Offline)</option>
+            <option value="Custom JSON Feed">Custom JSON Challenge Feed</option>
           </select>
         </div>
 
         <div class="wizard-group">
-          <label>Optional: Custom Feed URL</label>
-          <input type="url" id="customFetchUrl" class="search-input" placeholder="https://example.org/api/challenges.json">
+          <label for="customFetchUrl">Optional: Custom JSON Feed URL</label>
+          <input type="url" id="customFetchUrl" class="search-input" style="padding-left:0.85rem;" placeholder="https://example.org/challenges.json">
         </div>
 
         <div id="fetchStatusBox" style="margin-top:1rem; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-size:0.82rem; display:none;"></div>
 
         <div style="margin-top:1.25rem;">
-          <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">Recent Ingestion Audit Log</h4>
-          <div id="fetchAuditLogs" style="font-size:0.78rem; color:var(--text-subtle); max-height:140px; overflow-y:auto; border:1px solid var(--border-subtle); padding:0.5rem; border-radius:var(--radius-sm);">
-            Loading audit records...
+          <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem;">Recent Sync Logs</h4>
+          <div id="fetchAuditLogs" style="font-size:0.78rem; color:var(--text-subtle); max-height:150px; overflow-y:auto; border:1px solid var(--border-subtle); padding:0.5rem; border-radius:var(--radius-sm);">
+            Loading sync records...
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal('fetchModal')">Close</button>
-        <button class="btn btn-primary" onclick="triggerLiveFetch()" id="triggerFetchBtn">🚀 Ingest New Challenges</button>
+        <button type="button" class="btn btn-outline" onclick="closeModal('fetchModal')">Close</button>
+        <button type="button" class="btn btn-primary" onclick="triggerLiveFetch()" id="triggerFetchBtn">Sync Catalog</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: ADD / SUGGEST HACKATHON -->
-  <div class="modal-overlay" id="addHackathonModal">
+  <div class="modal-overlay" id="addHackathonModal" role="dialog" aria-modal="true" aria-labelledby="addHackTitle">
     <div class="modal-sheet" style="max-width:580px;">
       <div class="modal-header">
-        <h3 style="font-size:1.15rem; font-weight:700;">Suggest an Upcoming Student Hackathon</h3>
-        <button class="close-btn" onclick="closeModal('addHackathonModal')">✕</button>
+        <h3 id="addHackTitle" style="font-size:1.15rem; font-weight:700;">Suggest an Upcoming Hackathon</h3>
+        <button type="button" class="close-btn" onclick="closeModal('addHackathonModal')" aria-label="Close modal">✕</button>
       </div>
       <form id="addHackathonForm" onsubmit="event.preventDefault(); submitHackathonSuggestion();">
         <div class="modal-body">
           <div class="wizard-group">
-            <label>Hackathon / Competition Name</label>
-            <input type="text" id="newHackName" class="search-input" placeholder="e.g. IEEE Coimbatore TechSprint 2026" required>
+            <label for="newHackName">Hackathon Name</label>
+            <input type="text" id="newHackName" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. IEEE Coimbatore TechSprint 2026" required>
           </div>
           <div class="wizard-group">
-            <label>Organizer / Institution</label>
-            <input type="text" id="newHackOrganizer" class="search-input" placeholder="e.g. KPRIET / Anna University / IEEE" required>
+            <label for="newHackOrganizer">Organizer / Institution</label>
+            <input type="text" id="newHackOrganizer" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. KPRIET / Anna University" required>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
             <div class="wizard-group">
-              <label>Location / City</label>
-              <input type="text" id="newHackLocation" class="search-input" placeholder="e.g. Coimbatore, Tamil Nadu" required>
+              <label for="newHackLocation">Location / City</label>
+              <input type="text" id="newHackLocation" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. Coimbatore, Tamil Nadu" required>
             </div>
             <div class="wizard-group">
-              <label>Region</label>
+              <label for="newHackRegion">Region</label>
               <select id="newHackRegion" class="filter-select" style="width:100%;">
                 <option value="Tamil Nadu">Tamil Nadu</option>
                 <option value="South India">South India</option>
@@ -1003,7 +1094,7 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
             <div class="wizard-group">
-              <label>Format</label>
+              <label for="newHackFormat">Format</label>
               <select id="newHackFormat" class="filter-select" style="width:100%;">
                 <option value="In-person">In-person</option>
                 <option value="Online">Online</option>
@@ -1011,69 +1102,69 @@
               </select>
             </div>
             <div class="wizard-group">
-              <label>Registration Deadline</label>
-              <input type="datetime-local" id="newHackDeadline" class="search-input" required>
+              <label for="newHackDeadline">Registration Deadline (IST)</label>
+              <input type="datetime-local" id="newHackDeadline" class="search-input" style="padding-left:0.85rem;" required>
             </div>
           </div>
           <div class="wizard-group">
-            <label>Official Registration URL</label>
-            <input type="url" id="newHackOfficialUrl" class="search-input" placeholder="https://unstop.com/... or official portal" required>
+            <label for="newHackOfficialUrl">Official Registration URL</label>
+            <input type="url" id="newHackOfficialUrl" class="search-input" style="padding-left:0.85rem;" placeholder="https://..." required>
           </div>
           <div class="wizard-group">
-            <label>Optional: Backup / Unstop / Devfolio Mirror URL</label>
-            <input type="url" id="newHackFallbackUrl" class="search-input" placeholder="https://devfolio.co/... or alternative link">
+            <label for="newHackFallbackUrl">Optional: Mirror URL</label>
+            <input type="url" id="newHackFallbackUrl" class="search-input" style="padding-left:0.85rem;" placeholder="https://...">
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
             <div class="wizard-group">
-              <label>Prize Pool</label>
-              <input type="text" id="newHackPrize" class="search-input" placeholder="e.g. ₹1,00,000 + Trophies">
+              <label for="newHackPrize">Prize Pool</label>
+              <input type="text" id="newHackPrize" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. ₹1,00,000">
             </div>
             <div class="wizard-group">
-              <label>Eligibility</label>
-              <input type="text" id="newHackEligibility" class="search-input" placeholder="e.g. College Students Only">
+              <label for="newHackEligibility">Eligibility</label>
+              <input type="text" id="newHackEligibility" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. College Students">
             </div>
           </div>
           <div class="wizard-group">
-            <label>Description & Themes</label>
-            <textarea id="newHackDesc" class="search-input" rows="2" placeholder="Brief details about problem themes and tracks..."></textarea>
+            <label for="newHackDesc">Description &amp; Themes</label>
+            <textarea id="newHackDesc" class="search-input" style="padding-left:0.85rem;" rows="2" placeholder="Brief summary of themes and tracks..."></textarea>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('addHackathonModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Publish to Radar</button>
+          <button type="submit" class="btn btn-primary">Submit Listing</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- MODAL: REPORT HACKATHON ISSUE -->
-  <div class="modal-overlay" id="reportHackathonModal">
+  <div class="modal-overlay" id="reportHackathonModal" role="dialog" aria-modal="true" aria-labelledby="reportHackTitle">
     <div class="modal-sheet" style="max-width:500px;">
       <div class="modal-header">
-        <h3 style="font-size:1.15rem; font-weight:700;">Report Listing or Stale Link</h3>
-        <button class="close-btn" onclick="closeModal('reportHackathonModal')">✕</button>
+        <h3 id="reportHackTitle" style="font-size:1.15rem; font-weight:700;">Report Listing or Stale Link</h3>
+        <button type="button" class="close-btn" onclick="closeModal('reportHackathonModal')" aria-label="Close modal">✕</button>
       </div>
       <form id="reportHackForm" onsubmit="event.preventDefault(); submitHackathonReport();">
         <input type="hidden" id="reportHackId">
         <div class="modal-body">
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-            Help fellow student builders keep the directory trustworthy. Flag closed registrations, expired links, or rescheduled dates.
+            Flag expired registration links, closed events, or rescheduled dates so listings stay accurate.
           </p>
           <div class="wizard-group">
-            <label>What is the issue with this event?</label>
+            <label for="reportIssueType">What is the issue?</label>
             <select id="reportIssueType" class="filter-select" style="width:100%;">
-              <option value="link_broken">Official URL is 404 / unavailable / broken</option>
+              <option value="link_broken">Official URL is unavailable / broken</option>
               <option value="registration_closed">Registration deadline passed / Closed</option>
               <option value="dates_changed">Dates or venue rescheduled</option>
-              <option value="incorrect_info">Eligibility or fees stated incorrectly</option>
+              <option value="incorrect_info">Eligibility or details stated incorrectly</option>
             </select>
           </div>
           <div class="wizard-group">
-            <label>Additional Notes or Working Link</label>
-            <textarea id="reportNotes" class="search-input" rows="3" placeholder="Provide working link or notes if known..."></textarea>
+            <label for="reportNotes">Notes or Corrected URL</label>
+            <textarea id="reportNotes" class="search-input" style="padding-left:0.85rem;" rows="3" placeholder="Provide working link or correction notes..."></textarea>
           </div>
         </div>
-        <div class="modal-footer">
+          <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('reportHackathonModal')">Cancel</button>
           <button type="submit" class="btn btn-primary">Submit Report</button>
         </div>
@@ -1081,13 +1172,90 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <!-- MODAL: ADD / SUGGEST PROBLEM STATEMENT -->
+  <div class="modal-overlay" id="addProblemModal" role="dialog" aria-modal="true" aria-labelledby="addProblemTitle">
+    <div class="modal-sheet" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 id="addProblemTitle" style="font-size:1.15rem; font-weight:700;">Add Problem Statement to Catalog</h3>
+        <button type="button" class="close-btn" onclick="closeModal('addProblemModal')" aria-label="Close modal">✕</button>
+      </div>
+      <form id="addProblemForm" onsubmit="event.preventDefault(); submitProblemSuggestion();">
+        <div class="modal-body">
+          <div style="display:grid; grid-template-columns:1fr 2fr; gap:0.65rem;">
+            <div class="wizard-group">
+              <label for="newProbCode">Code (Optional)</label>
+              <input type="text" id="newProbCode" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. BF201">
+            </div>
+            <div class="wizard-group">
+              <label for="newProbTitle">Problem Title</label>
+              <input type="text" id="newProbTitle" class="search-input" style="padding-left:0.85rem;" placeholder="Clear, concrete challenge title..." required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem;">
+            <div class="wizard-group">
+              <label for="newProbOrg">Organization / Track</label>
+              <input type="text" id="newProbOrg" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. KPRIET Innovation Lab">
+            </div>
+            <div class="wizard-group">
+              <label for="newProbDomain">Domain</label>
+              <select id="newProbDomain" class="filter-select" style="width:100%;">
+                <option value="Smart Agriculture">Smart Agriculture</option>
+                <option value="Smart Mobility & Transport">Smart Mobility &amp; Transport</option>
+                <option value="Healthcare & Biomedical">Healthcare &amp; Biomedical</option>
+                <option value="Renewable Energy">Renewable Energy</option>
+                <option value="Clean Water & Sanitation">Clean Water &amp; Sanitation</option>
+                <option value="Smart Education">Smart Education</option>
+                <option value="Cyber Security & Defence">Cyber Security &amp; Defence</option>
+                <option value="Disaster Management">Disaster Management</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem;">
+            <div class="wizard-group">
+              <label for="newProbCategory">Category</label>
+              <select id="newProbCategory" class="filter-select" style="width:100%;">
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Both">Both (Software + IoT)</option>
+              </select>
+            </div>
+            <div class="wizard-group">
+              <label for="newProbDifficulty">Difficulty</label>
+              <select id="newProbDifficulty" class="filter-select" style="width:100%;">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate" selected>Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="wizard-group">
+            <label for="newProbSummary">Problem Summary</label>
+            <textarea id="newProbSummary" class="search-input" style="padding-left:0.85rem;" rows="2" placeholder="Describe the concrete problem, constraints, and who experiences it..." required></textarea>
+          </div>
+          <div class="wizard-group">
+            <label for="newProbSkills">Required Skills (comma-separated)</label>
+            <input type="text" id="newProbSkills" class="search-input" style="padding-left:0.85rem;" placeholder="e.g. Python, FastAPI, React, Computer Vision">
+          </div>
+          <div class="wizard-group">
+            <label for="newProbSourceUrl">Reference / Source URL (Optional)</label>
+            <input type="url" id="newProbSourceUrl" class="search-input" style="padding-left:0.85rem;" placeholder="https://...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('addProblemModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitProblemBtn">Save to Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- Celebratory Confetti Canvas -->
-  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+  <!-- Optional Milestone Confetti Canvas (reduced-motion aware) -->
+  <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
   <!-- Application Logic -->
-  <script src="/app.js"></script>
+  <script src="/app.js?v=20261125d"></script>
 </body>
 </html>

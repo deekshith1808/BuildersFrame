@@ -1,0 +1,16 @@
+{
+  "syntax-integrity-check": {
+    "PostToolUse": [
+      {
+        "matcher": "write_file|edit_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/post_edit_check.sh",
+            "timeout": 8
+          }
+        ]
+      }
+    ]
+  }
+}
