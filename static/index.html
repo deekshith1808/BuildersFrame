@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20261125d">
+  <link rel="stylesheet" href="/style.css?v=20261125f">
 </head>
 <body>
   <a class="skip-link" href="#mainContent">Skip to main content</a>
@@ -171,9 +171,18 @@
               </form>
             </div>
 
-            <!-- Right Column: Modular BuildersFrame Visual (Problem -> Fit -> Plan) -->
+            <!-- Right Column: Modular BuildersFrame 3D Spatial Visual (Problem -> Fit -> Plan) -->
             <div class="hero-frame-col">
               <div class="builders-frame-widget" id="buildersFrameVisual" aria-label="Interactive workflow preview">
+                <div class="frame-depth-backdrop" aria-hidden="true"></div>
+                <div class="frame-corner-brackets" aria-hidden="true">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="frame-floating-badge" aria-hidden="true">
+                  <span class="floating-dot"></span>
+                  <span>Spatial Workflow • 3D</span>
+                </div>
+
                 <div class="frame-widget-header">
                   <span class="frame-label-mono">Sample workflow preview</span>
                   <div class="frame-stage-tabs" role="tablist" aria-label="BuildersFrame workflow steps">
@@ -1256,6 +1265,6 @@
   <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
   <!-- Application Logic -->
-  <script src="/app.js?v=20261125d"></script>
+  <script src="/app.js?v=20261125f"></script>
 </body>
 </html>

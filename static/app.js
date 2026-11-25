@@ -61,6 +61,9 @@ async function initApp() {
   attachCard3DTilt('#problemsStream', '.f-problem-card');
   attachCard3DTilt('#rankedProblemsList', '.match-card');
   attachCard3DTilt('#stackKanbanBoard', '.kanban-card');
+  attachCard3DTilt('#howItWorksSection', '.home-pillar-card');
+  attachCard3DTilt('#homeDomainsGrid', '.home-domain-card');
+  attachCard3DTilt('#hackathonsView', '.hackathon-card');
   heroMeshController = initHeroMeshCanvas();
   initConfettiCanvas();
 
@@ -363,6 +366,13 @@ function selectHeroFrameStep(stepName) {
       el.classList.remove('active');
     }
   });
+
+  const frameCard = document.getElementById('heroFrameCard');
+  if (frameCard && !prefersReducedMotion.matches) {
+    frameCard.classList.remove('is-turning');
+    void frameCard.offsetWidth;
+    frameCard.classList.add('is-turning');
+  }
 }
 
 function initScrollProgressBar() {
@@ -387,11 +397,15 @@ function attachCard3DTilt(containerSelector, cardSelector) {
     const card = e.target.closest(cardSelector);
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    const nx = (e.clientX - rect.left) / rect.width - 0.5;
-    const ny = (e.clientY - rect.top) / rect.height - 0.5;
-    const rotY = (nx * 4.5).toFixed(2);
-    const rotX = (ny * -3.5).toFixed(2);
-    card.style.transform = `perspective(900px) translateY(-5px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    const px = ((e.clientX - rect.left) / rect.width) * 100;
+    const py = ((e.clientY - rect.top) / rect.height) * 100;
+    const nx = px / 100 - 0.5;
+    const ny = py / 100 - 0.5;
+    const rotY = (nx * 5.2).toFixed(2);
+    const rotX = (ny * -4.2).toFixed(2);
+    card.style.setProperty('--mx', `${px.toFixed(1)}%`);
+    card.style.setProperty('--my', `${py.toFixed(1)}%`);
+    card.style.transform = `perspective(950px) translateY(-6px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
   });
 
   container.addEventListener('pointerout', (e) => {
@@ -410,15 +424,21 @@ function initHeroFrameParallax() {
   widget.addEventListener('pointermove', (e) => {
     if (prefersReducedMotion.matches) return;
     const rect = widget.getBoundingClientRect();
-    const normX = (e.clientX - rect.left) / rect.width - 0.5;
-    const normY = (e.clientY - rect.top) / rect.height - 0.5;
-    const rotY = (normX * 4).toFixed(2);
-    const rotX = (normY * -3.5).toFixed(2);
-    widget.style.transform = `perspective(1100px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    const px = ((e.clientX - rect.left) / rect.width) * 100;
+    const py = ((e.clientY - rect.top) / rect.height) * 100;
+    const normX = px / 100 - 0.5;
+    const normY = py / 100 - 0.5;
+    const rotY = (normX * 6.5).toFixed(2);
+    const rotX = (normY * -5.2).toFixed(2);
+    widget.style.setProperty('--px', `${px.toFixed(1)}%`);
+    widget.style.setProperty('--py', `${py.toFixed(1)}%`);
+    widget.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
   });
 
   widget.addEventListener('pointerleave', () => {
-    widget.style.transform = 'perspective(1100px) rotateX(0deg) rotateY(0deg)';
+    widget.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+    widget.style.setProperty('--px', '50%');
+    widget.style.setProperty('--py', '35%');
   });
 }
 
@@ -464,20 +484,72 @@ function initHeroMeshCanvas() {
   let isOffscreen = false;
   let isHomeActive = state.activeView === 'home';
 
-  const MAX_PARTICLES = 26;
+  // 3D wireframe architectural frame vertices + orbital nodes
+  const outerCube = [
+    [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+    [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+  ];
+  const cubeEdges = [
+    [0, 1], [1, 2], [2, 3], [3, 0],
+    [4, 5], [5, 6], [6, 7], [7, 4],
+    [0, 4], [1, 5], [2, 6], [3, 7]
+  ];
+  const innerOct = [
+    [0, -1.05, 0], [1.05, 0, 0], [0, 0, 1.05], [-1.05, 0, 0], [0, 0, -1.05], [0, 1.05, 0]
+  ];
+  const octEdges = [
+    [0, 1], [0, 2], [0, 3], [0, 4],
+    [5, 1], [5, 2], [5, 3], [5, 4],
+    [1, 2], [2, 3], [3, 4], [4, 1]
+  ];
+
+  const MAX_PARTICLES = 22;
   const palette = ['#8FA187', '#A3B19C', '#CBBBA6', '#445749'];
   const particles = [];
   let phase = 0;
+  let pointerTiltX = 0;
+  let pointerTiltY = 0;
 
   for (let i = 0; i < MAX_PARTICLES; i++) {
+    const theta = (i / MAX_PARTICLES) * Math.PI * 2;
     particles.push({
-      x: Math.random(),
-      y: Math.random(),
-      vx: (Math.random() - 0.5) * 0.00032,
-      vy: (Math.random() - 0.5) * 0.00028,
-      r: 1.8 + (i % 4) * 0.75,
+      x: (Math.random() - 0.5) * 2.2,
+      y: (Math.random() - 0.5) * 1.4,
+      z: Math.sin(theta) * 0.9,
+      vx: (Math.random() - 0.5) * 0.0014,
+      vy: (Math.random() - 0.5) * 0.0011,
+      r: 2.0 + (i % 3) * 0.85,
       color: palette[i % palette.length]
     });
+  }
+
+  if (supportsHoverPointer.matches) {
+    stage.addEventListener('pointermove', (e) => {
+      if (prefersReducedMotion.matches) return;
+      const rect = stage.getBoundingClientRect();
+      pointerTiltY = ((e.clientX - rect.left) / rect.width - 0.5) * 0.35;
+      pointerTiltX = ((e.clientY - rect.top) / rect.height - 0.5) * -0.25;
+    }, { passive: true });
+  }
+
+  function project3D(pt, rx, ry, cx, cy, scale, fov = 4.2) {
+    const cosY = Math.cos(ry);
+    const sinY = Math.sin(ry);
+    const cosX = Math.cos(rx);
+    const sinX = Math.sin(rx);
+
+    const x1 = pt[0] * cosY - pt[2] * sinY;
+    const z1 = pt[0] * sinY + pt[2] * cosY;
+    const y2 = pt[1] * cosX - z1 * sinX;
+    const z2 = pt[1] * sinX + z1 * cosX;
+
+    const depth = fov / (fov + z2 + 1.4);
+    return {
+      x: cx + x1 * scale * depth,
+      y: cy + y2 * scale * depth,
+      z: z2,
+      scale: depth
+    };
   }
 
   function resize() {
@@ -497,39 +569,87 @@ function initHeroMeshCanvas() {
   function drawFrame(advance) {
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, height);
-    if (advance) phase += 0.018;
+    if (advance) phase += 0.0085;
 
+    // Draw 3D architectural wireframe anchor centered behind the right/center stage
+    const frameCenterX = width > 900 ? width * 0.72 : width * 0.5;
+    const frameCenterY = height * 0.48;
+    const frameScale = Math.min(width, height) * 0.25;
+
+    const rotY = phase * 0.75 + pointerTiltY;
+    const rotX = 0.32 + Math.sin(phase * 0.4) * 0.14 + pointerTiltX;
+
+    const projOuter = outerCube.map(v => project3D(v, rotX, rotY, frameCenterX, frameCenterY, frameScale));
+    cubeEdges.forEach(([a, b]) => {
+      const pA = projOuter[a];
+      const pB = projOuter[b];
+      const avgDepth = (pA.scale + pB.scale) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pA.x, pA.y);
+      ctx.lineTo(pB.x, pB.y);
+      ctx.strokeStyle = '#8FA187';
+      ctx.globalAlpha = Math.max(0.08, Math.min(0.32, (avgDepth - 0.55) * 0.85));
+      ctx.lineWidth = avgDepth > 0.76 ? 1.5 : 0.9;
+      ctx.stroke();
+    });
+
+    const projInner = innerOct.map(v => project3D(v, -rotX * 0.8, -rotY * 1.25, frameCenterX, frameCenterY, frameScale * 0.58));
+    octEdges.forEach(([a, b]) => {
+      const pA = projInner[a];
+      const pB = projInner[b];
+      ctx.beginPath();
+      ctx.moveTo(pA.x, pA.y);
+      ctx.lineTo(pB.x, pB.y);
+      ctx.strokeStyle = '#CBBBA6';
+      ctx.globalAlpha = 0.28;
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    });
+
+    // Project and depth-sort ambient 3D particles across full stage
+    const projectedParticles = [];
     for (let i = 0; i < MAX_PARTICLES; i++) {
       const p = particles[i];
       if (advance) {
         p.x += p.vx;
-        p.y += p.vy + Math.sin(phase + i * 0.7) * 0.00009;
-        if (p.x < 0.02 || p.x > 0.98) p.vx *= -1;
-        if (p.y < 0.02 || p.y > 0.98) p.vy *= -1;
+        p.y += p.vy + Math.sin(phase * 1.5 + i) * 0.0004;
+        if (p.x < -1.1 || p.x > 1.1) p.vx *= -1;
+        if (p.y < -0.8 || p.y > 0.8) p.vy *= -1;
       }
+      const proj = project3D(
+        [p.x, p.y, p.z],
+        pointerTiltX * 0.4,
+        phase * 0.22 + pointerTiltY * 0.4,
+        width * 0.5,
+        height * 0.5,
+        Math.max(width, height) * 0.42
+      );
+      projectedParticles.push({ ...proj, r: p.r, color: p.color, i });
+    }
 
-      const px = p.x * width;
-      const py = p.y * height;
-      const pulseR = p.r + (advance ? Math.sin(phase * 1.4 + i) * 0.45 : 0);
+    projectedParticles.sort((a, b) => a.z - b.z);
 
+    for (let i = 0; i < projectedParticles.length; i++) {
+      const a = projectedParticles[i];
+      const radius = Math.max(1.2, a.r * a.scale);
       ctx.beginPath();
-      ctx.arc(px, py, Math.max(1.1, pulseR), 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = 0.52;
+      ctx.arc(a.x, a.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = a.color;
+      ctx.globalAlpha = Math.max(0.18, Math.min(0.62, a.scale * 0.72));
       ctx.fill();
 
-      for (let j = i + 1; j < MAX_PARTICLES; j++) {
-        const p2 = particles[j];
-        const dx = px - p2.x * width;
-        const dy = py - p2.y * height;
+      for (let j = i + 1; j < projectedParticles.length; j++) {
+        const b = projectedParticles[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
         const distSq = dx * dx + dy * dy;
-        if (distSq < 25600) { // 160px radius
+        if (distSq < 25600) {
           ctx.beginPath();
-          ctx.moveTo(px, py);
-          ctx.lineTo(p2.x * width, p2.y * height);
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
           ctx.strokeStyle = '#8FA187';
-          ctx.globalAlpha = (1 - Math.sqrt(distSq) / 160) * 0.28;
-          ctx.lineWidth = 1;
+          ctx.globalAlpha = (1 - Math.sqrt(distSq) / 160) * 0.24;
+          ctx.lineWidth = 0.95;
           ctx.stroke();
         }
       }
